@@ -1,0 +1,90 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: menu_pedidos_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - menu_pedidos_network
+
+  redis:
+    image: redis:alpine
+    container_name: menu_pedidos_redis
+    networks:
+      - menu_pedidos_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: menu_pedidos_backend
+    volumes:
+      - ./backend:/var/www
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_NAME}
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+    depends_on:
+      - db
+      - redis
+    networks:
+      - menu_pedidos_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: menu_pedidos_nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+    networks:
+      - menu_pedidos_network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: menu_pedidos_frontend
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api
+    depends_on:
+      - backend
+    networks:
+      - menu_pedidos_network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: menu_pedidos_pma
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - menu_pedidos_network
+
+networks:
+  menu_pedidos_network:
+    driver: bridge
+
+volumes:
+  db_data:
