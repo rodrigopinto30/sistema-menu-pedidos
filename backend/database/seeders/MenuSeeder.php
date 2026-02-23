@@ -38,10 +38,10 @@ class MenuSeeder extends Seeder
             'max_selectable' => 3,
         ]);
 
-        \App\Models\OptionItem::create(['option_group_id' => $sizeGroup->id, 'name' => 'Regular', 'extra_price' => 0]);
-        \App\Models\OptionItem::create(['option_group_id' => $sizeGroup->id, 'name' => 'Double', 'extra_price' => 5.00]);
+        \App\Models\OptionItem::create(['option_group_id' => $sizeGroup->id, 'name' => 'Regular', 'additional_price' => 0]);
+        \App\Models\OptionItem::create(['option_group_id' => $sizeGroup->id, 'name' => 'Double', 'additional_price' => 5.00]);
 
-        \App\Models\OptionItem::create(['option_group_id' => $extrasGroup->id, 'name' => 'Bacon', 'extra_price' => 1.50]);
-        \App\Models\OptionItem::create(['option_group_id' => $extrasGroup->id, 'name' => 'Cheddar', 'extra_price' => 1.00]);
+        \App\Models\OptionItem::create(['option_group_id' => $extrasGroup->id, 'name' => 'Bacon', 'additional_price' => 1.50]);
+        \App\Models\OptionItem::create(['option_group_id' => $extrasGroup->id, 'name' => 'Cheddar', 'additional_price' => 1.00]);
     }
 }

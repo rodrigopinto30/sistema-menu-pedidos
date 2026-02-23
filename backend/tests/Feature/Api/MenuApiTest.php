@@ -9,6 +9,8 @@ use Tests\TestCase;
 
 class MenuApiTest extends TestCase
 {
+    use RefreshDatabase;
+
     #[Test]
     public function it_returns_the_active_menu_catalog()
     {
