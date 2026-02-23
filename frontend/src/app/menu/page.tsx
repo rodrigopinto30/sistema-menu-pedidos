@@ -1,40 +1,40 @@
 import { getMenu } from "@/lib/api";
+import { ProductCard } from "@/components/menu/ProductCard";
 
 export default async function MenuPage() {
   const categories = await getMenu();
 
   return (
-    <main className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Nuestro Menú</h1>
+    <div className="container mx-auto py-10 px-4">
+      <header className="mb-12 text-center">
+        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-4">
+          Nuestro Menú
+        </h1>
+        <p className="text-xl text-muted-foreground">
+          Calidad artesanal en cada bocado.
+        </p>
+      </header>
 
       {categories.map((category: any) => (
-        <section key={category.id} className="mb-10">
-          <h2 className="text-2xl font-semibold border-b-2 border-orange-500 pb-2 mb-4">
+        <section
+          key={category.id}
+          className="mb-16"
+          aria-labelledby={`cat-${category.id}`}
+        >
+          <h2
+            id={`cat-${category.id}`}
+            className="text-2xl font-semibold mb-6 pb-2 border-b uppercase tracking-wider text-orange-600"
+          >
             {category.name}
           </h2>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {category.products.map((product: any) => (
-              <div
-                key={product.id}
-                className="p-4 border rounded-lg shadow-sm hover:shadow-md transition"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-bold">{product.name}</h3>
-                    <p className="text-gray-600 text-sm">
-                      {product.description}
-                    </p>
-                  </div>
-                  <span className="font-mono text-orange-600">
-                    ${product.price}
-                  </span>
-                </div>
-              </div>
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </section>
       ))}
-    </main>
+    </div>
   );
 }
