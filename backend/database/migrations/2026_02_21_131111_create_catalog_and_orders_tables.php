@@ -51,9 +51,11 @@ return new class extends Migration
             $table->id();
             $table->string('customer_name');
             $table->string('table_number')->nullable();
+            $table->string('customer_phone');
+            $table->text('customer_address');
             $table->enum('status', ['pending', 'preparing', 'ready', 'delivered', 'cancelled'])->default('pending');
             $table->enum('payment_method', ['cash', 'card', 'online'])->default('cash');
-            $table->decimal('total_amount', 10, 2);
+            $table->decimal('total_price', 10, 2)->default(0);
             $table->text('notes')->nullable();
             $table->timestamps();
         });
@@ -64,7 +66,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained();
             $table->integer('quantity');
             $table->decimal('price_at_time', 10, 2);
-            $table->json('selected_options')->nullable();
+            $table->json('options_snapshot')->nullable();
             $table->timestamps();
         });
     }
