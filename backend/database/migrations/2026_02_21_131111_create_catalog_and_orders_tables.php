@@ -23,9 +23,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->string('image')->nullable();
+            $table->decimal('price', 8, 2);
             $table->boolean('is_available')->default(true);
+            $table->string('image_url')->nullable();
             $table->timestamps();
         });
 
@@ -43,7 +43,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('option_group_id')->constrained()->onDelete('cascade');
             $table->string('name');
-            $table->decimal('extra_price', 10, 2)->default(0);
+            $table->decimal('additional_price', 8, 2)->default(0);
             $table->timestamps();
         });
 
