@@ -1,62 +1,45 @@
 "use client";
 
-import { useState } from "react";
-import { placeOrder, OrderPayload } from "@/services/orderServices";
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { useCartStore } from "@/store/useCartStore";
+import { ProductCard } from "@/components/ProductCard";
 import { CheckoutForm } from "@/components/CheckoutForm";
 
+const MOCK_PRODUCTS = [
+  {
+    id: 3,
+    name: "Pizza Margherita",
+    price: 12,
+    description: "Tomato, mozzarella, basil",
+  },
+];
+
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const mockCartItems = [
-    { product_id: 3, quantity: 2 },
-    { product_id: 3, quantity: 1 },
-  ];
-
-  const handleSuccess = () => {
-    console.log("🏆 Order placed from the UI!");
-    alert("Check your database! The order should be there.");
-  };
+  const totalItems = useCartStore((state: any) => state.getTotalItems());
 
   return (
-    <div className="p-8 max-w-2xl mx-auto space-y-12">
-      <section>
-        <h2 className="text-xl font-bold mb-4 text-gray-700">
-          Test 1: Checkout Form (Real UI)
-        </h2>
-        <CheckoutForm cartItems={mockCartItems} onSuccess={handleSuccess} />
-      </section>
+    <main className="p-8 max-w-6xl mx-auto">
+      <header className="flex justify-between items-center mb-12">
+        <h1 className="text-3xl font-bold">Menu Pedidos</h1>
+        <div className="bg-primary text-white px-4 py-2 rounded-full">
+          🛒 Cart: {totalItems} items
+        </div>
+      </header>
 
-      <hr className="border-t border-gray-200" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <section className="space-y-6">
+          <h2 className="text-xl font-semibold">Our Menu</h2>
+          <div className="grid gap-4">
+            {MOCK_PRODUCTS.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
 
-      <section>
-        <h2 className="text-xl font-bold mb-4 text-gray-700">
-          Test 2: Quick Order Button (Previous Test)
-        </h2>
-        <Button
-          onClick={async () => {
-            setIsLoading(true);
-            try {
-              await placeOrder({
-                customer_name: "Pepe Fast",
-                customer_phone: "1122334455",
-                customer_address: "Fast Track 123",
-                items: [{ product_id: 1, quantity: 1 }],
-              });
-              alert("✅ Quick order worked!");
-            } catch (e) {
-              alert("❌ Fail");
-            } finally {
-              setIsLoading(false);
-            }
-          }}
-          disabled={isLoading}
-        >
-          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Send Fast Order
-        </Button>
-      </section>
-    </div>
+        <section className="space-y-6">
+          <h2 className="text-xl font-semibold">Complete your Order</h2>
+          <CheckoutForm onSuccess={() => alert("Order Sent!")} />
+        </section>
+      </div>
+    </main>
   );
 }

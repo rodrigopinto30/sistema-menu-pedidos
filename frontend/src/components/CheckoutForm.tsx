@@ -7,11 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCartStore } from "@/store/useCartStore";
 interface CheckoutFormProps {
-  cartItems: { product_id: number; quantity: number }[];
   onSuccess: () => void;
 }
 
-export function CheckoutForm({ cartItems, onSuccess }: CheckoutFormProps) {
+export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
   const { items, clearCart } = useCartStore();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -23,7 +22,7 @@ export function CheckoutForm({ cartItems, onSuccess }: CheckoutFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (cartItems.length === 0) return alert("Cart is empty");
+    if (items.length === 0) return alert("Cart is empty");
 
     setLoading(true);
 
@@ -32,7 +31,7 @@ export function CheckoutForm({ cartItems, onSuccess }: CheckoutFormProps) {
         customer_name: formData.name,
         customer_phone: formData.phone,
         customer_address: formData.address,
-        items: cartItems,
+        items: items,
       });
       clearCart();
       onSuccess();
@@ -84,7 +83,7 @@ export function CheckoutForm({ cartItems, onSuccess }: CheckoutFormProps) {
       <Button
         type="submit"
         className="w-full"
-        disabled={loading || cartItems.length === 0}
+        disabled={loading || items.length === 0}
       >
         {loading ? "Processing..." : "Confirm Order"}
       </Button>
