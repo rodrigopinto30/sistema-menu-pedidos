@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export async function getMenu() {
   const isServer = typeof window === 'undefined';
   
@@ -17,3 +19,19 @@ export async function getMenu() {
 
   return res.json();
 }
+
+
+
+const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000/api',
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+});
+
+export const placeOrder = (orderData: any) => {
+    return api.post('/orders', orderData);
+};
+
+export default api;
