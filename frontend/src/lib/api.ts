@@ -21,17 +21,8 @@ export async function getMenu() {
 }
 
 
-
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000/api',
-    headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-    }
+    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
 });
-
-export const placeOrder = (orderData: any) => {
-    return api.post('/orders', orderData);
-};
 
 export default api;

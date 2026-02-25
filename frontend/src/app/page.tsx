@@ -1,30 +1,38 @@
 "use client";
 
-import { placeOrder } from "../lib/api";
+import { useState } from "react";
+import { placeOrder, OrderPayload } from "@/services/orderServices";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 export default function Home() {
-  const testOrder = async () => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleTestOrder = async () => {
+    setIsLoading(true);
+    const payload: OrderPayload = {
+      customer_name: "Pepe",
+      customer_phone: "1122334455",
+      customer_address: "Calle Falsa 123",
+      items: [{ product_id: 3, quantity: 2 }],
+    };
+
     try {
-      const response = await placeOrder({
-        customer_name: "pepe",
-        customer_phone: "1122334455",
-        customer_address: "Calle Falsa 123",
-        items: [
-          {
-            product_id: 3,
-            quantity: 2,
-          },
-        ],
-      });
-      console.log("✅ ORDEN CREADA:", response.data);
-    } catch (error) {
-      console.error("❌ ERROR DE VALIDACIÓN:", error.response.data);
+      const response = await placeOrder(payload);
+      alert("✅ Orden #" + response.data.order.id + " creada!");
+    } catch (error: any) {
+      alert("❌ Error: " + (error.response?.data?.message || "Algo falló"));
+    } finally {
+      setIsLoading(false);
     }
   };
+
   return (
-    <div>
-      <Button onClick={() => testOrder()}>test</Button>
+    <div className="p-8">
+      <Button onClick={handleTestOrder} disabled={isLoading}>
+        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        Probar Pedido
+      </Button>
     </div>
   );
 }
