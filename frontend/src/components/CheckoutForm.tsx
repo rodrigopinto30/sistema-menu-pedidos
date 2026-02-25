@@ -5,13 +5,14 @@ import { placeOrder, OrderPayload } from "@/services/orderServices";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
+import { useCartStore } from "@/store/useCartStore";
 interface CheckoutFormProps {
   cartItems: { product_id: number; quantity: number }[];
   onSuccess: () => void;
 }
 
 export function CheckoutForm({ cartItems, onSuccess }: CheckoutFormProps) {
+  const { items, clearCart } = useCartStore();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -21,19 +22,20 @@ export function CheckoutForm({ cartItems, onSuccess }: CheckoutFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (cartItems.length === 0) return alert("Cart is empty");
+
     setLoading(true);
 
-    const payload: OrderPayload = {
-      customer_name: formData.name,
-      customer_phone: formData.phone,
-      customer_address: formData.address,
-      items: cartItems,
-    };
-
     try {
-      await placeOrder(payload);
+      await placeOrder({
+        customer_name: formData.name,
+        customer_phone: formData.phone,
+        customer_address: formData.address,
+        items: cartItems,
+      });
+      clearCart();
       onSuccess();
-      alert("Order placed successfully! 🍕");
     } catch (error: any) {
       console.error(error.response?.data);
       alert("Error: " + (error.response?.data?.message || "Check your data"));
