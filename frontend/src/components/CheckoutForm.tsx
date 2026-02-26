@@ -1,21 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { placeOrder, OrderPayload } from "@/services/orderServices";
+import { placeOrder } from "@/services/orderServices";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCartStore } from "@/store/useCartStore";
-import { Category } from "@/services/productServices";
 import { CartSummary } from "./CartSummary";
-interface CheckoutFormProps {
-  onSuccess: () => void;
-  categories: Category[];
-}
+import { CheckCircle2, ShoppingBag } from "lucide-react";
 
-export function CheckoutForm({ onSuccess, categories }: CheckoutFormProps) {
+export function CheckoutForm({
+  onSuccess,
+  categories,
+}: {
+  onSuccess: () => void;
+  categories: any[];
+}) {
   const { items, clearCart } = useCartStore();
   const [loading, setLoading] = useState(false);
+  const [isOrdered, setIsOrdered] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -24,9 +27,6 @@ export function CheckoutForm({ onSuccess, categories }: CheckoutFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (items.length === 0) return alert("Cart is empty");
-
     setLoading(true);
 
     try {
@@ -36,15 +36,36 @@ export function CheckoutForm({ onSuccess, categories }: CheckoutFormProps) {
         customer_address: formData.address,
         items: items,
       });
+
       clearCart();
+      setIsOrdered(true);
       onSuccess();
     } catch (error: any) {
-      console.error(error.response?.data);
       alert("Error: " + (error.response?.data?.message || "Check your data"));
     } finally {
       setLoading(false);
     }
   };
+
+  if (isOrdered) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-center bg-green-50 rounded-xl border border-green-200 animate-in fade-in zoom-in duration-300">
+        <CheckCircle2 className="h-16 w-16 text-green-500 mb-4" />
+        <h2 className="text-2xl font-bold text-green-800">Order Received!</h2>
+        <p className="text-green-700 mt-2">
+          Thank you, <strong>{formData.name}</strong>. Your food is on the way
+          to <strong>{formData.address}</strong>.
+        </p>
+        <Button
+          variant="outline"
+          className="mt-6 border-green-600 text-green-700 hover:bg-green-100"
+          onClick={() => setIsOrdered(false)}
+        >
+          <ShoppingBag className="mr-2 h-4 w-4" /> Order Something Else
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-6 rounded-xl border shadow-sm h-fit">
