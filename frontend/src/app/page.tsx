@@ -13,6 +13,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { MenuSkeleton } from "@/components/menu/MenuSkeleton";
 
 export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -35,9 +36,14 @@ export default function Home() {
 
   if (loading)
     return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="animate-spin h-8 w-8 text-orange-500" />
-      </div>
+      <main className="p-4 md:p-8 max-w-6xl mx-auto">
+        <div className="h-16 w-48 bg-gray-100 rounded mb-10 animate-pulse" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <section className="md:col-span-2">
+            <MenuSkeleton />
+          </section>
+        </div>
+      </main>
     );
 
   return (
