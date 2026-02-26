@@ -68,7 +68,10 @@ export default function Home() {
           <h2 className="text-2xl font-bold mb-6 text-gray-800">
             Finalizar Pedido
           </h2>
-          <CheckoutForm onSuccess={() => alert("¡Pedido enviado con éxito!")} />
+          <CheckoutForm
+            onSuccess={() => alert("¡Pedido enviado con éxito!")}
+            categories={categories}
+          />
         </section>
       </div>
     </main>
