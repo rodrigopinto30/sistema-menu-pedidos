@@ -6,11 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCartStore } from "@/store/useCartStore";
+import { Category } from "@/services/productServices";
+import { CartSummary } from "./CartSummary";
 interface CheckoutFormProps {
   onSuccess: () => void;
+  categories: Category[];
 }
 
-export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
+export function CheckoutForm({ onSuccess, categories }: CheckoutFormProps) {
   const { items, clearCart } = useCartStore();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -44,49 +47,54 @@ export function CheckoutForm({ onSuccess }: CheckoutFormProps) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 p-4 border rounded-lg shadow-sm"
-    >
-      <div className="space-y-2">
-        <Label htmlFor="name">Full Name</Label>
-        <Input
-          id="name"
-          required
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="phone">Phone Number</Label>
-        <Input
-          id="phone"
-          required
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="address">Delivery Address</Label>
-        <Input
-          id="address"
-          required
-          value={formData.address}
-          onChange={(e) =>
-            setFormData({ ...formData, address: e.target.value })
-          }
-        />
-      </div>
-
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={loading || items.length === 0}
+    <div className="bg-white p-6 rounded-xl border shadow-sm h-fit">
+      <CartSummary categories={categories} />
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 p-4 border rounded-lg shadow-sm"
       >
-        {loading ? "Processing..." : "Confirm Order"}
-      </Button>
-    </form>
+        <div className="space-y-2">
+          <Label htmlFor="name">Full Name</Label>
+          <Input
+            id="name"
+            required
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="phone">Phone Number</Label>
+          <Input
+            id="phone"
+            required
+            value={formData.phone}
+            onChange={(e) =>
+              setFormData({ ...formData, phone: e.target.value })
+            }
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="address">Delivery Address</Label>
+          <Input
+            id="address"
+            required
+            value={formData.address}
+            onChange={(e) =>
+              setFormData({ ...formData, address: e.target.value })
+            }
+          />
+        </div>
+
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={loading || items.length === 0}
+        >
+          {loading ? "Processing..." : "Confirm Order"}
+        </Button>
+      </form>
+    </div>
   );
 }
