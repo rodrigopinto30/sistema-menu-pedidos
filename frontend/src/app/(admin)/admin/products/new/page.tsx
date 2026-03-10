@@ -1,35 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Category, getMenu } from "@/services/productServices";
+import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Save } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 export default function NewProductPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     price: "",
     description: "",
-    category_id: "1",
+    category_id: "",
   });
+
+  useEffect(() => {
+    getMenu().then(setCategories).catch(console.error);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    if (!formData.category_id) return alert("Please select a category");
 
+    setLoading(true);
     try {
-      console.log("Saving product:", formData);
+      await api.post("/products", {
+        ...formData,
+        price: parseFloat(formData.price),
+        is_available: true,
+      });
 
       router.push("/admin/products");
       router.refresh();
-    } catch (error) {
-      console.error("Error creating product:", error);
+    } catch (error: any) {
+      alert(
+        "Error saving product: " +
+          (error.response?.data?.message || "Check connection"),
+      );
     } finally {
       setLoading(false);
     }
@@ -43,84 +65,81 @@ export default function NewProductPage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Create New Product
-        </h1>
+        <h1 className="text-3xl font-bold">New Product</h1>
       </div>
 
-      <div className="bg-white p-8 rounded-xl border shadow-sm">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded-xl border shadow-sm space-y-6"
+      >
+        <div className="space-y-2">
+          <Label>Product Name</Label>
+          <Input
+            required
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Product Name</Label>
+            <Label>Price ($)</Label>
             <Input
-              id="name"
-              placeholder="e.g. Pepperoni Pizza"
+              type="number"
+              step="0.01"
               required
-              value={formData.name}
+              value={formData.price}
               onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
+                setFormData({ ...formData, price: e.target.value })
               }
             />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="price">Price ($)</Label>
-              <Input
-                id="price"
-                type="number"
-                step="0.01"
-                placeholder="0.00"
-                required
-                value={formData.price}
-                onChange={(e) =>
-                  setFormData({ ...formData, price: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="category">Category ID</Label>
-              <Input
-                id="category"
-                type="number"
-                value={formData.category_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, category_id: e.target.value })
-                }
-              />
-            </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description (Optional)</Label>
-            <Textarea
-              id="description"
-              placeholder="Describe the ingredients or details..."
-              className="min-h-[100px]"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
+            <Label>Category</Label>
+            <Select
+              onValueChange={(value: any) =>
+                setFormData({ ...formData, category_id: value })
               }
-            />
-          </div>
-
-          <div className="pt-4 flex gap-4">
-            <Button
-              type="submit"
-              className="flex-1 bg-orange-600 hover:bg-orange-700"
-              disabled={loading}
             >
-              <Save className="mr-2 h-4 w-4" />
-              {loading ? "Saving..." : "Save Product"}
-            </Button>
-            <Link href="/admin/products" className="flex-1">
-              <Button variant="outline" className="w-full">
-                Cancel
-              </Button>
-            </Link>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id.toString()}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        </form>
-      </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Description</Label>
+          <Textarea
+            className="min-h-[100px]"
+            value={formData.description}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
+          />
+        </div>
+
+        <Button
+          type="submit"
+          className="w-full bg-orange-600 hover:bg-orange-700 h-12"
+          disabled={loading}
+        >
+          {loading ? (
+            <Loader2 className="animate-spin mr-2" />
+          ) : (
+            <Save className="mr-2 h-4 w-4" />
+          )}
+          {loading ? "Creating..." : "Save Product"}
+        </Button>
+      </form>
     </div>
   );
 }
