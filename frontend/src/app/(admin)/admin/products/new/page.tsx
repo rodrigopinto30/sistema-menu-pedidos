@@ -61,7 +61,7 @@ export default function NewProductPage() {
     <div className="p-8 max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
         <Link href="/admin/products">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="cursor-pointer">
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </Link>
@@ -129,7 +129,7 @@ export default function NewProductPage() {
 
         <Button
           type="submit"
-          className="w-full bg-orange-600 hover:bg-orange-700 h-12"
+          className="cursor-pointer w-full bg-orange-600 hover:bg-orange-700 h-12"
           disabled={loading}
         >
           {loading ? (
