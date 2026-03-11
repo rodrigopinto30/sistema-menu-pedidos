@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+
+    public function index()
+    {
+        return Order::with(['items.product'])->latest()->get();
+    }
+
     public function store(StoreOrderRequest $request)
     {
         return DB::transaction(function () use ($request) {
