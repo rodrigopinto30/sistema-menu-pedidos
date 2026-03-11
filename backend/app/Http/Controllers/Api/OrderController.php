@@ -7,6 +7,7 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
@@ -51,5 +52,25 @@ class OrderController extends Controller
                 'order'   => $order->load('items')
             ], 201);
         });
+    }
+
+
+    public function updateStatus(Request $request, Order $order)
+    {
+        try {
+            $validated = $request->validate([
+                'status' => 'required|string'
+            ]);
+
+            $order->status = $validated['status'];
+            $order->save();
+
+            return response()->json([
+                'message' => 'Status updated',
+                'order' => $order
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

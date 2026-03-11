@@ -10,5 +10,6 @@ Route::get('/menu', [MenuController::class, 'index']);
 
 Route::get('/orders', [OrderController::class, 'index']);
 Route::post('/orders', [OrderController::class, 'store']);
+Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus']);
 
 Route::apiResource('products', ProductController::class);
