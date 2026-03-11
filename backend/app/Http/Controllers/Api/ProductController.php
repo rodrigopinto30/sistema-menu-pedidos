@@ -32,6 +32,27 @@ class ProductController extends Controller
         return response()->json($product, 201);
     }
 
+    public function show(Product $product)
+    {
+        return $product->load('category');
+    }
+
+    public function update(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'price' => 'required|numeric',
+            'description' => 'nullable|string',
+        ]);
+
+        $validated['slug'] = Str::slug($request->name);
+
+        $product->update($validated);
+
+        return response()->json($product);
+    }
+
     public function destroy(Product $product)
     {
         $product->delete();
