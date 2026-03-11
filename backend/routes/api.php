@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ProductController;
 
 Route::get('/menu', [MenuController::class, 'index']);
 
+Route::get('/orders', [OrderController::class, 'index']);
 Route::post('/orders', [OrderController::class, 'store']);
 
 Route::apiResource('products', ProductController::class);
