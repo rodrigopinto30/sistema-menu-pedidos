@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Eye, ShoppingCart } from "lucide-react";
+import { Loader2, Eye, ShoppingCart, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,6 +25,72 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+
+  const handlePrint = (order: any) => {
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+
+    const itemsHtml = order.items
+      .map(
+        (item: any) => `
+    <tr>
+      <td style="padding: 5px 0;">${item.quantity}x ${item.product?.name}</td>
+      <td style="text-align: right;">$${(item.price_at_time * item.quantity).toFixed(2)}</td>
+    </tr>
+  `,
+      )
+      .join("");
+
+    printWindow.document.write(`
+    <html>
+      <head>
+        <title>Ticket #MD-${order.id}</title>
+        <style>
+          body { font-family: 'Courier New', Courier, monospace; width: 300px; padding: 20px; color: #000; }
+          .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
+          .total { border-top: 1px dashed #000; margin-top: 10px; padding-top: 10px; font-weight: bold; font-size: 1.2em; }
+          table { width: 100%; border-collapse: collapse; }
+          .footer { text-align: center; margin-top: 20px; font-size: 0.8em; }
+          @media print { .no-print { display: none; } }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h2>FOODIE APP</h2>
+          <p>Order ID: #MD-${order.id}</p>
+          <p>Date: ${new Date(order.created_at).toLocaleString()}</p>
+        </div>
+        <div>
+          <p><strong>Customer:</strong> ${order.customer_name}</p>
+          <p><strong>Address:</strong> ${order.customer_address}</p>
+          <p><strong>Phone:</strong> ${order.customer_phone}</p>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align: left;">Item</th>
+              <th style="text-align: right;">Subt.</th>
+            </tr>
+          </thead>
+          <tbody>${itemsHtml}</tbody>
+        </table>
+        <div class="total">
+          <div style="display: flex; justify-content: space-between;">
+            <span>TOTAL:</span>
+            <span>$${order.total_price}</span>
+          </div>
+        </div>
+        <div class="footer">
+          <p>Thank you for your order!</p>
+        </div>
+        <script>
+          window.onload = function() { window.print(); window.close(); };
+        </script>
+      </body>
+    </html>
+  `);
+    printWindow.document.close();
+  };
 
   useEffect(() => {
     api
@@ -91,11 +157,19 @@ export default function AdminOrdersPage() {
                     </DialogTrigger>
 
                     <DialogContent className="max-w-md">
-                      <DialogHeader>
+                      <DialogHeader className="flex flex-row items-center justify-between">
                         <DialogTitle className="flex items-center gap-2">
                           <ShoppingCart className="h-5 w-5 text-orange-600" />
                           Order Details #{selectedOrder?.id}
                         </DialogTitle>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePrint(selectedOrder)}
+                          className="cursor-pointer mr-4 gap-2"
+                        >
+                          <Printer className="h-4 w-4" /> Print Ticket
+                        </Button>
                       </DialogHeader>
 
                       <div className="mt-4 space-y-4">
