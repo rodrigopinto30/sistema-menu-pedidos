@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
-import { Category, getMenu } from "@/services/productServices";
 import {
   Table,
   TableBody,
@@ -11,45 +10,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Trash2, Loader2, Pencil } from "lucide-react";
-import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Edit2, Trash2, Search, Plus, Loader2 } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-export default function AdminProductsPage() {
+export default function ProductsAdmin() {
   const [products, setProducts] = useState<any[]>([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await api.get("/products");
-      setProducts(response.data);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchProducts();
+    api
+      .get("/products")
+      .then((res: any) => setProducts(res.data))
+      .finally(() => setLoading(false));
   }, []);
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
-
-    setDeletingId(id);
-    try {
-      await api.delete(`/products/${id}`);
-      setProducts(products.filter((p) => p.id !== id));
-    } catch (error) {
-      alert("Error deleting product");
-    } finally {
-      setDeletingId(null);
-    }
-  };
+  const filteredProducts = products.filter((p: any) =>
+    p.name.toLowerCase().includes(search.toLowerCase()),
+  );
 
   const toggleAvailability = async (id: number) => {
     try {
@@ -60,43 +43,73 @@ export default function AdminProductsPage() {
         ),
       );
     } catch (error) {
-      alert("Error updating availability");
+      console.error("Error updating availability", error);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (confirm("Are you sure you want to delete this product?")) {
+      try {
+        await api.delete(`/products/${id}`);
+        setProducts(products.filter((p: any) => p.id !== id));
+      } catch (error) {
+        console.error("Error deleting product", error);
+      }
     }
   };
 
   if (loading)
     return (
       <div className="p-8 flex justify-center">
-        <Loader2 className="animate-spin" />
+        <Loader2 className="animate-spin text-orange-600" />
       </div>
     );
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Manage Products</h1>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+            Product Inventory
+          </h1>
+          <p className="text-muted-foreground">
+            Manage your catalog, prices and availability.
+          </p>
+        </div>
         <Link href="/admin/products/new">
-          <Button className="cursor-pointer bg-orange-600 hover:bg-orange-700 shadow-sm">
-            <PlusCircle className="mr-2 h-4 w-4" /> New Product
+          <Button className="bg-orange-600 hover:bg-orange-700 shadow-sm cursor-pointer">
+            <Plus className="mr-2 h-4 w-4" /> Add Product
           </Button>
         </Link>
       </div>
 
+      <div className="flex items-center space-x-2 bg-white p-2 rounded-lg border shadow-sm">
+        <Search className="h-4 w-4 text-gray-400 ml-2" />
+        <Input
+          placeholder="Search products..."
+          className="border-none shadow-none focus-visible:ring-0"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
       <div className="border rounded-xl bg-white shadow-sm overflow-hidden">
         <Table>
-          <TableHeader className="bg-gray-50/50">
+          <TableHeader className="bg-gray-50">
             <TableRow>
-              <TableHead className="font-semibold">Name</TableHead>
-              <TableHead className="font-semibold">Category</TableHead>
-              <TableHead className="font-semibold">Price</TableHead>
-              <TableHead className="font-semibold">Status</TableHead>
-              <TableHead className="text-right font-semibold">
+              <TableHead className="font-bold text-gray-700">Name</TableHead>
+              <TableHead className="font-bold text-gray-700">
+                Category
+              </TableHead>
+              <TableHead className="font-bold text-gray-700">Price</TableHead>
+              <TableHead className="font-bold text-gray-700">Status</TableHead>
+              <TableHead className="text-right font-bold text-gray-700">
                 Actions
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((product) => (
+            {filteredProducts.map((product: any) => (
               <TableRow
                 key={product.id}
                 className="hover:bg-gray-50/50 transition-colors"
@@ -105,11 +118,11 @@ export default function AdminProductsPage() {
                   {product.name}
                 </TableCell>
                 <TableCell>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  <Badge variant="secondary" className="font-normal">
                     {product.category?.name || "Uncategorized"}
-                  </span>
+                  </Badge>
                 </TableCell>
-                <TableCell className="text-gray-600 font-medium">
+                <TableCell className="font-mono font-semibold">
                   ${product.price}
                 </TableCell>
                 <TableCell>
@@ -117,7 +130,7 @@ export default function AdminProductsPage() {
                     <Switch
                       checked={product.is_available}
                       onCheckedChange={() => toggleAvailability(product.id)}
-                      className="data-[state=checked]:bg-green-500"
+                      className="cursor-pointer data-[state=checked]:bg-green-500"
                     />
                     <span
                       className={cn(
@@ -137,26 +150,18 @@ export default function AdminProductsPage() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-9 w-9 text-blue-600 hover:text-blue-700 hover:bg-blue-50 cursor-pointer"
-                        title="Edit product"
+                        className="h-9 w-9 text-blue-600 hover:bg-blue-50 cursor-pointer"
                       >
-                        <Pencil className="h-4 w-4" />
+                        <Edit2 className="h-4 w-4" />
                       </Button>
                     </Link>
-
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-9 w-9 text-red-500 hover:text-red-700 hover:bg-red-50 cursor-pointer"
+                      className="h-9 w-9 text-red-500 hover:bg-red-50 cursor-pointer"
                       onClick={() => handleDelete(product.id)}
-                      disabled={deletingId === product.id}
-                      title="Delete product"
                     >
-                      {deletingId === product.id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>
