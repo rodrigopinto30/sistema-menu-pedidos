@@ -22,10 +22,11 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric',
             'description' => 'nullable|string',
+            'is_available' => 'boolean'
         ]);
 
         $validated['slug'] = Str::slug($request->name);
-        $validated['is_available'] = true;
+        // $validated['is_available'] = true;
 
         $product = Product::create($validated);
 
@@ -57,5 +58,16 @@ class ProductController extends Controller
     {
         $product->delete();
         return response()->json(null, 204);
+    }
+
+    public function toggleAvailability(Product $product)
+    {
+        $product->is_available = !$product->is_available;
+        $product->save();
+
+        return response()->json([
+            'message' => 'Product availability updated',
+            'is_available' => $product->is_available
+        ]);
     }
 }

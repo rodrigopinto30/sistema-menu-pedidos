@@ -13,3 +13,4 @@ Route::post('/orders', [OrderController::class, 'store']);
 Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus']);
 
 Route::apiResource('products', ProductController::class);
+Route::patch('/products/{product}/toggle', [ProductController::class, 'toggleAvailability']);
