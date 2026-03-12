@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Category, getMenu } from "@/services/productServices";
+import { useRouter, useParams } from "next/navigation";
 import api from "@/lib/api";
+import { Category, getMenu } from "@/services/productServices";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,9 +18,11 @@ import {
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import Link from "next/link";
 
-export default function NewProductPage() {
+export default function EditProductPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const { id } = useParams();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
     name: "",
@@ -30,42 +32,62 @@ export default function NewProductPage() {
   });
 
   useEffect(() => {
-    getMenu().then(setCategories).catch(console.error);
-  }, []);
+    const loadData = async () => {
+      try {
+        const [categoriesData, productRes] = await Promise.all([
+          getMenu(),
+          api.get(`/products/${id}`),
+        ]);
+
+        setCategories(categoriesData);
+        setFormData({
+          name: productRes.data.name,
+          price: productRes.data.price.toString(),
+          description: productRes.data.description || "",
+          category_id: productRes.data.category_id.toString(),
+        });
+      } catch (error) {
+        alert("Could not load product data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.category_id) return alert("Please select a category");
-
-    setLoading(true);
+    setSaving(true);
     try {
-      await api.post("/products", {
+      await api.put(`/products/${id}`, {
         ...formData,
         price: parseFloat(formData.price),
-        is_available: true,
       });
-
       router.push("/admin/products");
       router.refresh();
-    } catch (error: any) {
-      alert(
-        "Error saving product: " +
-          (error.response?.data?.message || "Check connection"),
-      );
+    } catch (error) {
+      alert("Error updating product");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
+
+  if (loading)
+    return (
+      <div className="p-8 flex justify-center">
+        <Loader2 className="animate-spin h-8 w-8 text-orange-500" />
+      </div>
+    );
 
   return (
     <div className="p-8 max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
         <Link href="/admin/products">
-          <Button variant="ghost" size="icon" className="cursor-pointer">
+          <Button variant="ghost" size="icon">
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold">New Product</h1>
+        <h1 className="text-3xl font-bold">Edit Product</h1>
       </div>
 
       <form
@@ -98,6 +120,7 @@ export default function NewProductPage() {
           <div className="space-y-2">
             <Label>Category</Label>
             <Select
+              value={formData.category_id}
               onValueChange={(value: any) =>
                 setFormData({ ...formData, category_id: value })
               }
@@ -129,15 +152,15 @@ export default function NewProductPage() {
 
         <Button
           type="submit"
-          className="cursor-pointer w-full bg-orange-600 hover:bg-orange-700 h-12"
-          disabled={loading}
+          className="w-full bg-blue-600 hover:bg-blue-700 h-12 cursor-pointer"
+          disabled={saving}
         >
-          {loading ? (
-            <Loader2 className="animate-spin mr-2" />
+          {saving ? (
+            <Loader2 className="animate-spin mr-2 h-4 w-4" />
           ) : (
             <Save className="mr-2 h-4 w-4" />
           )}
-          {loading ? "Creating..." : "Save Product"}
+          {saving ? "Updating..." : "Update Product"}
         </Button>
       </form>
     </div>

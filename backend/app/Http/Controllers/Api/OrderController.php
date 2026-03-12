@@ -7,9 +7,16 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+
+    public function index()
+    {
+        return Order::with(['items.product'])->latest()->get();
+    }
+
     public function store(StoreOrderRequest $request)
     {
         return DB::transaction(function () use ($request) {
@@ -45,5 +52,25 @@ class OrderController extends Controller
                 'order'   => $order->load('items')
             ], 201);
         });
+    }
+
+
+    public function updateStatus(Request $request, Order $order)
+    {
+        try {
+            $validated = $request->validate([
+                'status' => 'required|string'
+            ]);
+
+            $order->status = $validated['status'];
+            $order->save();
+
+            return response()->json([
+                'message' => 'Status updated',
+                'order' => $order
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }
