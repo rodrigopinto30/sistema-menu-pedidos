@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\MenuController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\CategoryController;
 
 Route::get('/menu', [MenuController::class, 'index']);
 
@@ -14,3 +15,7 @@ Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])
 
 Route::apiResource('products', ProductController::class);
 Route::patch('/products/{product}/toggle', [ProductController::class, 'toggleAvailability']);
+
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::post('/categories', [CategoryController::class, 'store']);
+Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
