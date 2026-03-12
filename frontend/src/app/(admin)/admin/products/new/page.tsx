@@ -96,7 +96,15 @@ export default function NewProductPage() {
           </div>
 
           <div className="space-y-2">
-            <Label>Category</Label>
+            <div className="flex justify-between items-center">
+              <Label>Category</Label>
+              <Link
+                href="/admin/categories"
+                className="text-xs text-orange-600 hover:underline"
+              >
+                Manage categories
+              </Link>
+            </div>
             <Select
               onValueChange={(value: any) =>
                 setFormData({ ...formData, category_id: value })
