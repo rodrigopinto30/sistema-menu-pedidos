@@ -14,6 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Trash2, Loader2, Pencil } from "lucide-react";
 import Link from "next/link";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -49,6 +51,19 @@ export default function AdminProductsPage() {
     }
   };
 
+  const toggleAvailability = async (id: number) => {
+    try {
+      const response = await api.patch(`/products/${id}/toggle`);
+      setProducts((prev) =>
+        prev.map((p) =>
+          p.id === id ? { ...p, is_available: response.data.is_available } : p,
+        ),
+      );
+    } catch (error) {
+      alert("Error updating availability");
+    }
+  };
+
   if (loading)
     return (
       <div className="p-8 flex justify-center">
@@ -74,6 +89,7 @@ export default function AdminProductsPage() {
               <TableHead className="font-semibold">Name</TableHead>
               <TableHead className="font-semibold">Category</TableHead>
               <TableHead className="font-semibold">Price</TableHead>
+              <TableHead className="font-semibold">Status</TableHead>
               <TableHead className="text-right font-semibold">
                 Actions
               </TableHead>
@@ -95,6 +111,25 @@ export default function AdminProductsPage() {
                 </TableCell>
                 <TableCell className="text-gray-600 font-medium">
                   ${product.price}
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={product.is_available}
+                      onCheckedChange={() => toggleAvailability(product.id)}
+                      className="data-[state=checked]:bg-green-500"
+                    />
+                    <span
+                      className={cn(
+                        "text-xs font-medium",
+                        product.is_available
+                          ? "text-green-600"
+                          : "text-gray-400",
+                      )}
+                    >
+                      {product.is_available ? "Available" : "Sold Out"}
+                    </span>
+                  </div>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end items-center gap-2">
