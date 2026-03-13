@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useCartStore } from "@/store/useCartStore";
 import { CartSummary } from "./CartSummary";
 import { CheckCircle2, ShoppingBag } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function CheckoutForm({
   onSuccess,
@@ -27,19 +28,29 @@ export function CheckoutForm({
     address: "",
   });
 
+  const router = useRouter();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await placeOrder({
+      const response = await placeOrder({
         customer_name: formData.name,
         customer_phone: formData.phone,
         customer_address: formData.address,
         items: items,
       });
-      clearCart();
-      setIsOrdered(true);
-      onSuccess();
+
+      const orderId = response.data.order?.id;
+
+      if (orderId) {
+        clearCart();
+        setIsOrdered(true);
+        onSuccess();
+        router.push(`/order/status/${orderId}`);
+      } else {
+        console.error("Estructura de respuesta inesperada:", response.data);
+      }
     } catch (error: any) {
       alert("Error processing order");
     } finally {
