@@ -1,28 +1,40 @@
 import axios from 'axios';
+import { useAuthStore } from '@/store/useAuthStore';
 
-export async function getMenu() {
-  const isServer = typeof window === 'undefined';
-  
-  const baseUrl = isServer 
-    ? 'http://menu_pedidos_nginx/api' 
-    : 'http://localhost:8000/api';
-
-  console.log(`Fetching from: ${baseUrl}/menu`);
-
-  const res = await fetch(`${baseUrl}/menu`, {
-    cache: 'no-store',
-  });
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch menu: ${res.status} ${res.statusText}`);
-  }
-
-  return res.json();
-}
-
+const isServer = typeof window === 'undefined';
+const baseURL = isServer 
+  ? 'http://menu_pedidos_nginx/api' 
+  : 'http://localhost:8000/api';
 
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
+    baseURL,
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+    }
 });
+
+api.interceptors.request.use((config: any) => {
+    if (!isServer) {
+        const token = useAuthStore.getState().token;
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+    }
+    return config;
+}, (error: any) => {
+    return Promise.reject(error);
+});
+
+export async function getMenu() {
+    console.log(`Fetching menu from: ${baseURL}/menu`);
+    try {
+        const res = await api.get('/menu');
+        return res.data;
+    } catch (error) {
+        console.error("Error fetching menu:", error);
+        throw new Error("Failed to fetch menu");
+    }
+}
 
 export default api;
