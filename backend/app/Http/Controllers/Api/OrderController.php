@@ -17,6 +17,17 @@ class OrderController extends Controller
         return Order::with(['items.product'])->latest()->get();
     }
 
+    public function show($id)
+    {
+        $order = Order::with(['items.product'])->find($id);
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        return response()->json($order);
+    }
+
     public function store(StoreOrderRequest $request)
     {
         return DB::transaction(function () use ($request) {
@@ -53,7 +64,6 @@ class OrderController extends Controller
             ], 201);
         });
     }
-
 
     public function updateStatus(Request $request, Order $order)
     {
