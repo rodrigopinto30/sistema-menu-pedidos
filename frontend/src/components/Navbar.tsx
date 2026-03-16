@@ -11,6 +11,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+import { Button } from "./ui/button";
 
 export function Navbar() {
   const totalItems = useCartStore((state: any) => state.getTotalItems());
@@ -43,19 +44,21 @@ export function Navbar() {
                     <span className="text-sm font-bold text-gray-800">
                       Hola, {user.name}
                     </span>
-                    <Link
-                      href="/admin"
-                      className="text-[10px] text-orange-600 uppercase font-bold hover:underline"
-                    >
-                      Panel Admin
-                    </Link>
+                    {user.role === "admin" && (
+                      <Link
+                        href="/admin"
+                        className="text-[10px] text-orange-600 uppercase font-bold hover:underline"
+                      >
+                        Panel Admin
+                      </Link>
+                    )}
                   </div>
-                  <button
+                  <Button
                     onClick={handleLogout}
-                    className="p-2 text-gray-500 hover:text-red-600 transition-colors"
+                    className="cursor-pointer p-2 bg-white text-red-600 transition-colors hover:bg-red-600 hover:text-white"
                   >
                     <LogOut className="h-5 w-5" />
-                  </button>
+                  </Button>
                 </div>
               )}
 

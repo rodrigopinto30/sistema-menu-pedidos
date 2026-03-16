@@ -3,13 +3,19 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value;
+  const role = request.cookies.get('user_role')?.value; 
   const { pathname } = request.nextUrl;
 
   const isLoginPage = pathname === '/login' || pathname === '/register';
-  const isProtectedRoute = pathname === '/' || pathname.startsWith('/order') || pathname.startsWith('/admin');
+  const isAdminRoute = pathname.startsWith('/admin');
+  const isProtectedRoute = pathname === '/' || pathname.startsWith('/order') || isAdminRoute;
 
   if (isProtectedRoute && !token) {
     return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  if (isAdminRoute && role !== 'admin') {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   if (token && isLoginPage) {
@@ -18,7 +24,3 @@ export function middleware(request: NextRequest) {
 
   return NextResponse.next();
 }
-
-export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
-};
