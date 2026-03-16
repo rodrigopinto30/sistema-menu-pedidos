@@ -11,15 +11,14 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-
     public function index()
     {
-        return Order::with(['items.product'])->latest()->get();
+        return Order::with(['items.product', 'history'])->latest()->get();
     }
 
     public function show($id)
     {
-        $order = Order::with(['items.product'])->find($id);
+        $order = Order::with(['items.product', 'history'])->find($id);
 
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
@@ -31,7 +30,6 @@ class OrderController extends Controller
     public function store(StoreOrderRequest $request)
     {
         return DB::transaction(function () use ($request) {
-
             $order = Order::create([
                 'customer_name'    => $request->customer_name,
                 'customer_phone'   => $request->customer_phone,
@@ -41,7 +39,6 @@ class OrderController extends Controller
             ]);
 
             $totalPrice = 0;
-
 
             foreach ($request->items as $item) {
                 $product = Product::find($item['product_id']);
@@ -60,7 +57,7 @@ class OrderController extends Controller
 
             return response()->json([
                 'message' => 'Order created successfully',
-                'order'   => $order->load('items')
+                'order'   => $order->load(['items', 'history'])
             ], 201);
         });
     }
@@ -77,7 +74,7 @@ class OrderController extends Controller
 
             return response()->json([
                 'message' => 'Status updated',
-                'order' => $order
+                'order' => $order->load('history')
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
