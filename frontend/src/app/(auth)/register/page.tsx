@@ -30,18 +30,30 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: SignUpInput) => {
     try {
-      const res = await api.post("/register", {
+      await api.post("/register", {
         name: data.name,
         email: data.email,
         password: data.password,
         password_confirmation: data.confirmPassword,
       });
 
-      setAuth(res.data.user, res.data.token);
-      toast.success("Account created successfully!");
-      router.push("/");
+      toast.success("Account created! Please sign in with your credentials.");
+
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Registration failed");
+      if (error.response?.status === 500) {
+        toast.error("Server error. Please try again later.");
+      } else {
+        const serverErrors = error.response?.data?.errors;
+        const message = serverErrors
+          ? (Object.values(serverErrors).flat()[0] as string)
+          : error.response?.data?.message;
+
+        toast.error(message || "Registration failed");
+      }
+      console.error("Register Error:", error.response?.data);
     }
   };
 
