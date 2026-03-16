@@ -25,8 +25,8 @@ export default function Home() {
     );
 
   return (
-    <main className="p-4 md:p-8 max-w-6xl mx-auto">
-      <section className="mb-12">
+    <div className="space-y-10">
+      <section>
         <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
           Nuestro Menú
         </h1>
@@ -35,8 +35,8 @@ export default function Home() {
         </p>
       </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-        <section className="md:col-span-2 space-y-12">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <section className="xl:col-span-2 space-y-12">
           {categories.map((category) => (
             <div key={category.id} className="space-y-6">
               <h2 className="text-2xl font-bold text-gray-800 border-l-4 border-orange-500 pl-4">
@@ -51,13 +51,13 @@ export default function Home() {
           ))}
         </section>
 
-        <aside className="relative">
+        <aside className="hidden xl:block">
           <div className="sticky top-24 bg-white p-6 rounded-2xl border shadow-xl">
             <h2 className="text-2xl font-bold mb-6 text-gray-800">Tu Pedido</h2>
             <CheckoutForm categories={categories} onSuccess={() => {}} />
           </div>
         </aside>
       </div>
-    </main>
+    </div>
   );
 }
