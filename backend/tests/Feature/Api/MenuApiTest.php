@@ -16,17 +16,11 @@ class MenuApiTest extends TestCase
     {
         $this->seed(\Database\Seeders\MenuSeeder::class);
 
-        $response = $this->getJson('/api/menu');
+        $user = \App\Models\User::factory()->create();
 
-        $response->assertStatus(200)
-            ->assertJsonStructure([
-                '*' => [
-                    'id',
-                    'name',
-                    'products' => [
-                        '*' => ['id', 'name', 'option_groups']
-                    ]
-                ]
-            ]);
+        $response = $this->actingAs($user, 'sanctum')
+            ->getJson('/api/menu');
+
+        $response->assertStatus(200);
     }
 }

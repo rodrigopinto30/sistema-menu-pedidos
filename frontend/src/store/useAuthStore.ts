@@ -31,6 +31,7 @@ export const useAuthStore = create<AuthState>()(
         Cookies.remove('user_role');
         set({ user: null, token: null });
       },
+      updateUser: (updatedUser: User) => set({ user: updatedUser }),
     }),
     { name: 'auth-storage' }
   )
