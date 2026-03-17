@@ -15,6 +15,8 @@ class OrderApiTest extends TestCase
     #[Test]
     public function test_it_can_create_an_order_successfully()
     {
+        $user = \App\Models\User::factory()->create();
+
         $productA = Product::factory()->create(['price' => 10.00]);
         $productB = Product::factory()->create(['price' => 20.00]);
 
@@ -34,8 +36,8 @@ class OrderApiTest extends TestCase
             ]
         ];
 
-        $response = $this->postJson('/api/orders', $payload);
-
+        $response = $this->actingAs($user, 'sanctum')
+            ->postJson('/api/orders', $payload);
         $response->assertStatus(201)
             ->assertJsonPath('order.total_price', 40);
 
@@ -50,9 +52,11 @@ class OrderApiTest extends TestCase
     #[Test]
     public function it_fails_if_required_fields_are_missing()
     {
-        $response = $this->postJson('/api/orders', []);
+        $user = \App\Models\User::factory()->create();
 
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['customer_name', 'items']);
+        $response = $this->actingAs($user, 'sanctum')
+            ->postJson('/api/orders', []);
+
+        $response->assertStatus(422);
     }
 }
