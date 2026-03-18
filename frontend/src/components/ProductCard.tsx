@@ -32,7 +32,10 @@ export function ProductCard({ product }: { product: Product }) {
         <p className="text-lg font-bold mt-2">${product.price}</p>
       </CardContent>
       <CardFooter>
-        <Button className="w-full" onClick={() => addItem(product.id)}>
+        <Button
+          className="cursor-pointer w-full"
+          onClick={() => addItem(product.id)}
+        >
           Add to Cart
         </Button>
       </CardFooter>

@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { CartDrawer } from "./CartDrawer";
 
 export function Navbar() {
   const totalItems = useCartStore((state: any) => state.getTotalItems());
@@ -109,11 +110,7 @@ export function Navbar() {
                 </DropdownMenu>
               )}
 
-              {/* Cart Indicator */}
-              <div className="flex items-center bg-orange-500 text-white px-4 py-2 rounded-full font-bold shadow-sm shadow-orange-200 transition-transform hover:scale-105 active:scale-95 cursor-pointer ml-2">
-                <ShoppingCart className="mr-2 h-4 w-4" />
-                <span className="text-sm">{totalItems}</span>
-              </div>
+              <CartDrawer />
             </>
           ) : (
             !user && (

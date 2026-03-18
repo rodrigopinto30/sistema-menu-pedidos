@@ -78,7 +78,7 @@ export function CheckoutForm({
             </p>
             <Button
               variant="outline"
-              className="mt-6 border-green-600 text-green-700 hover:bg-green-100"
+              className="cursor-pointer mt-6 border-green-600 text-green-700 hover:bg-green-100"
               onClick={() => setIsOrdered(false)}
             >
               <ShoppingBag className="mr-2 h-4 w-4" /> Order More
@@ -136,7 +136,7 @@ export function CheckoutForm({
 
               <Button
                 type="submit"
-                className="w-full h-12 text-lg"
+                className="cursor-pointer w-full h-12 text-lg"
                 disabled={loading || items.length === 0}
               >
                 {loading ? "Processing..." : "Confirm Order"}
