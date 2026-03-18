@@ -9,8 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCartStore } from "@/store/useCartStore";
 import { CartSummary } from "./CartSummary";
-import { CheckCircle2, ShoppingBag } from "lucide-react";
+import { CheckCircle2, ShoppingBag, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export function CheckoutForm({
   onSuccess,
@@ -48,8 +49,6 @@ export function CheckoutForm({
         setIsOrdered(true);
         onSuccess();
         router.push(`/order/status/${orderId}`);
-      } else {
-        console.error("Estructura de respuesta inesperada:", response.data);
       }
     } catch (error: any) {
       alert("Error processing order");
@@ -64,21 +63,23 @@ export function CheckoutForm({
         {isOrdered ? (
           <motion.div
             key="success"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="flex flex-col items-center justify-center p-8 text-center bg-green-50 rounded-xl border border-green-200"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center justify-center p-10 text-center bg-emerald-50/50 rounded-[32px] border-none"
           >
-            <CheckCircle2 className="h-16 w-16 text-green-500 mb-4" />
-            <h2 className="text-2xl font-bold text-green-800">
+            <div className="bg-emerald-100 p-4 rounded-full mb-4">
+              <CheckCircle2 className="h-12 w-12 text-emerald-600" />
+            </div>
+            <h2 className="text-2xl font-black text-slate-800 tracking-tighter">
               Order Received!
             </h2>
-            <p className="text-green-700 mt-2">
-              Thanks <strong>{formData.name}</strong>! Your order is on the way.
+            <p className="text-slate-600 mt-2 text-sm">
+              Thanks <strong>{formData.name}</strong>! Your order is being
+              prepared.
             </p>
             <Button
               variant="outline"
-              className="cursor-pointer mt-6 border-green-600 text-green-700 hover:bg-green-100"
+              className="mt-8 rounded-2xl border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-300 transition-all font-bold px-8"
               onClick={() => setIsOrdered(false)}
             >
               <ShoppingBag className="mr-2 h-4 w-4" /> Order More
@@ -87,18 +88,25 @@ export function CheckoutForm({
         ) : (
           <motion.div
             key="form"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="bg-white p-6 rounded-xl border shadow-sm"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-[24px] border-none"
           >
             <CartSummary categories={categories} />
-            <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+
+            <form onSubmit={handleSubmit} className="space-y-6 mt-6">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label
+                  htmlFor="name"
+                  className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1"
+                >
+                  Full Name
+                </Label>
                 <Input
                   id="name"
                   required
+                  placeholder="John Doe"
+                  className="h-12 rounded-2xl border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-emerald-500/20 focus:border-emerald-500 transition-all px-4"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -106,14 +114,20 @@ export function CheckoutForm({
                 />
               </div>
 
-              <div className="space-y-2 flex flex-col">
-                <Label htmlFor="phone">Phone Number</Label>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="phone"
+                  className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1"
+                >
+                  Phone Number
+                </Label>
                 <PatternFormat
                   format="(###) ###-####"
                   mask="_"
                   customInput={Input}
                   id="phone"
                   required
+                  className="h-12 rounded-2xl border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-emerald-500/20 focus:border-emerald-500 transition-all px-4"
                   value={formData.phone}
                   onValueChange={(values: any) => {
                     setFormData({ ...formData, phone: values.formattedValue });
@@ -123,10 +137,17 @@ export function CheckoutForm({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="address">Delivery Address</Label>
+                <Label
+                  htmlFor="address"
+                  className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1"
+                >
+                  Delivery Address
+                </Label>
                 <Input
                   id="address"
                   required
+                  placeholder="123 Street, City"
+                  className="h-12 rounded-2xl border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-emerald-500/20 focus:border-emerald-500 transition-all px-4"
                   value={formData.address}
                   onChange={(e) =>
                     setFormData({ ...formData, address: e.target.value })
@@ -136,10 +157,22 @@ export function CheckoutForm({
 
               <Button
                 type="submit"
-                className="cursor-pointer w-full h-12 text-lg"
+                className={cn(
+                  "cursor-pointer w-full h-14 rounded-[20px] text-base font-bold transition-all border-none active:scale-[0.98]",
+                  loading || items.length === 0
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                    : "bg-emerald-600 text-white hover:bg-emerald-700 shadow-none",
+                )}
                 disabled={loading || items.length === 0}
               >
-                {loading ? "Processing..." : "Confirm Order"}
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>Processing...</span>
+                  </div>
+                ) : (
+                  "Confirm Order"
+                )}
               </Button>
             </form>
           </motion.div>

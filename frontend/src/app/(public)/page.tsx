@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Category, getMenu } from "@/services/productServices";
 import { ProductCard } from "@/components/ProductCard";
 import { MenuSkeleton } from "@/components/menu/MenuSkeleton";
+import { Sparkles } from "lucide-react";
 
 export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -18,29 +19,42 @@ export default function Home() {
 
   if (loading)
     return (
-      <main className="p-4 md:p-8">
+      <main className="max-w-7xl mx-auto px-6 py-12">
         <MenuSkeleton />
       </main>
     );
 
   return (
-    <div className="space-y-10 w-full">
-      <section>
-        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
-          Our Menu
+    <div className="max-w-7xl mx-auto px-6 py-12 space-y-16 animate-in fade-in duration-700">
+      <section className="space-y-4">
+        <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 w-fit px-4 py-1.5 rounded-full border border-emerald-100/50">
+          <Sparkles className="h-4 w-4" />
+          <span className="text-xs font-black uppercase tracking-[0.2em]">
+            Fresh & Delicious
+          </span>
+        </div>
+        <h1 className="text-5xl md:text-6xl font-black text-slate-900 tracking-tighter leading-none">
+          Our <span className="text-emerald-600">Menu</span>
         </h1>
-        <p className="text-gray-500">
-          Select your favorites and complete your order.
+        <p className="text-slate-500 text-lg max-w-xl font-medium tracking-tight">
+          Choose from our selection of handcrafted dishes and enjoy a unique
+          culinary experience.
         </p>
       </section>
 
-      <div className="space-y-16">
+      <div className="space-y-24">
         {categories.map((category) => (
-          <div key={category.id} className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800 border-l-4 border-orange-500 pl-4">
-              {category.name}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div key={category.id} className="group space-y-8">
+            <div className="flex items-center gap-6">
+              <h2 className="text-3xl font-black text-slate-800 tracking-tighter shrink-0 transition-transform group-hover:translate-x-1 duration-300">
+                {category.name}
+              </h2>
+              <div className="h-[2px] w-full bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-full w-24 bg-emerald-600/30 rounded-full" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {category.products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
