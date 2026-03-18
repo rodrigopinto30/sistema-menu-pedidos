@@ -15,8 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Loader2, PackagePlus, Info } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -57,37 +58,64 @@ export default function NewProductPage() {
     }
   };
 
+  const labelStyle =
+    "text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1";
+  const inputStyle =
+    "bg-slate-50 border-slate-100 rounded-2xl focus-visible:ring-blue-500/20 focus-visible:border-blue-500 transition-all py-6";
+
   return (
-    <div className="p-8 max-w-2xl mx-auto space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/admin/products">
-          <Button variant="ghost" size="icon" className="cursor-pointer">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-        </Link>
-        <h1 className="text-3xl font-bold">New Product</h1>
+    <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link href="/admin/products">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="cursor-pointer bg-white border border-slate-100 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all h-11 w-11 shadow-sm"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          </Link>
+          <div className="space-y-1">
+            <h1 className="text-3xl font-black tracking-tighter text-slate-900">
+              New <span className="text-blue-600">Product</span>
+            </h1>
+            <p className="text-slate-500 text-sm font-medium italic">
+              Create a new item for your menu
+            </p>
+          </div>
+        </div>
+        <div className="hidden md:flex bg-blue-50 p-3 rounded-2xl border border-blue-100/50">
+          <PackagePlus className="h-6 w-6 text-blue-600" />
+        </div>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-xl border shadow-sm space-y-6"
+        className="bg-white p-10 rounded-[32px] border border-slate-100 shadow-2xl shadow-slate-200/50 space-y-8 relative overflow-hidden"
       >
-        <div className="space-y-2">
-          <Label>Product Name</Label>
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-600" />
+
+        <div className="space-y-3">
+          <Label className={labelStyle}>Product Name</Label>
           <Input
             required
+            placeholder="e.g. Classic Cheese Burger"
+            className={inputStyle}
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label>Price ($)</Label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-3">
+            <Label className={labelStyle}>Price ($)</Label>
             <Input
               type="number"
               step="0.01"
               required
+              placeholder="0.00"
+              className={inputStyle}
               value={formData.price}
               onChange={(e) =>
                 setFormData({ ...formData, price: e.target.value })
@@ -95,14 +123,14 @@ export default function NewProductPage() {
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <Label>Category</Label>
+              <Label className={labelStyle}>Category</Label>
               <Link
                 href="/admin/categories"
-                className="text-xs text-orange-600 hover:underline"
+                className="text-[10px] font-black text-blue-600 hover:text-blue-800 uppercase tracking-tighter"
               >
-                Manage categories
+                + Manage Categories
               </Link>
             </div>
             <Select
@@ -110,12 +138,16 @@ export default function NewProductPage() {
                 setFormData({ ...formData, category_id: value })
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className={cn(inputStyle, "py-3")}>
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-xl border-slate-100 shadow-xl">
                 {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id.toString()}>
+                  <SelectItem
+                    key={cat.id}
+                    value={cat.id.toString()}
+                    className="rounded-lg focus:bg-blue-50 focus:text-blue-600 cursor-pointer py-3 font-medium"
+                  >
                     {cat.name}
                   </SelectItem>
                 ))}
@@ -124,29 +156,38 @@ export default function NewProductPage() {
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label>Description</Label>
+        <div className="space-y-3">
+          <Label className={labelStyle}>Description</Label>
           <Textarea
-            className="min-h-[100px]"
+            placeholder="Describe the ingredients, size, or special details..."
+            className={cn(inputStyle, "min-h-[140px] py-4 resize-none")}
             value={formData.description}
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
             }
           />
+          <div className="flex items-center gap-2 text-slate-400 mt-2 px-1">
+            <Info className="h-3 w-3" />
+            <p className="text-[10px] font-bold uppercase tracking-widest">
+              This info will be visible to customers
+            </p>
+          </div>
         </div>
 
-        <Button
-          type="submit"
-          className="cursor-pointer w-full bg-orange-600 hover:bg-orange-700 h-12"
-          disabled={loading}
-        >
-          {loading ? (
-            <Loader2 className="animate-spin mr-2" />
-          ) : (
-            <Save className="mr-2 h-4 w-4" />
-          )}
-          {loading ? "Creating..." : "Save Product"}
-        </Button>
+        <div className="pt-4">
+          <Button
+            type="submit"
+            className="cursor-pointer w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-sm uppercase tracking-[0.2em] h-16 rounded-2xl shadow-lg shadow-blue-200 transition-all hover:scale-[1.01] active:scale-95 disabled:opacity-70 disabled:scale-100"
+            disabled={loading}
+          >
+            {loading ? (
+              <Loader2 className="animate-spin mr-3 h-5 w-5" />
+            ) : (
+              <Save className="mr-3 h-5 w-5" />
+            )}
+            {loading ? "Creating Entry..." : "Confirm & Save Product"}
+          </Button>
+        </div>
       </form>
     </div>
   );

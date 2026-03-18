@@ -6,12 +6,12 @@ import {
   LayoutDashboard,
   Package,
   ShoppingBag,
-  Settings,
   Store,
   ChevronRight,
   Menu,
-  LogOut,
   ListTree,
+  X,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -33,67 +33,116 @@ export function AdminSidebar({ isExpanded, setIsExpanded }: AdminSidebarProps) {
   const pathname = usePathname();
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <>
+      {isExpanded && (
+        <div
+          className="fixed inset-0 bg-slate-900/20 backdrop-blur-[4px] z-[60] animate-in fade-in duration-500"
+          onClick={() => setIsExpanded(false)}
+        />
+      )}
+
       <div
         className={cn(
-          "p-4 border-b border-gray-100 flex items-center",
-          isExpanded ? "justify-between" : "justify-center",
+          "fixed left-0 top-0 h-screen bg-white z-[70] transition-all duration-500 ease-in-out border-r border-slate-50 flex flex-col overflow-hidden",
+          isExpanded ? "w-72 shadow-2xl shadow-blue-900/10" : "w-20",
         )}
       >
-        {isExpanded && (
-          <Link
-            href="/admin"
-            className="flex items-center gap-2 font-black text-xl text-orange-600 animate-in fade-in duration-500"
-          >
-            <LayoutDashboard className="h-6 w-6" />
-            <span>FoodieAdmin</span>
-          </Link>
-        )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="cursor-pointer text-gray-500 hover:text-orange-600 hover:bg-orange-50"
+        <div
+          className={cn(
+            "p-6 flex items-center h-28 transition-all duration-500",
+            isExpanded ? "justify-between" : "justify-center",
+          )}
         >
-          <Menu className="h-6 w-6" />
-        </Button>
-      </div>
-
-      <nav className="flex-1 p-3 space-y-4 mt-4">
-        {menuItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "group flex items-center rounded-xl transition-all duration-200 relative",
-                isExpanded ? "px-3 py-3 justify-between" : "p-3 justify-center",
-                isActive
-                  ? "bg-orange-600 text-white shadow-lg shadow-orange-200"
-                  : "text-gray-500 hover:bg-gray-100 hover:text-gray-900",
-              )}
+          {isExpanded ? (
+            <>
+              <Link
+                href="/admin"
+                className="flex items-center gap-3 animate-in fade-in slide-in-from-left-4 duration-700"
+              >
+                <div className="bg-blue-600 p-2.5 rounded-[14px] shadow-lg shadow-blue-100">
+                  <ShieldCheck className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-xl font-black text-slate-900 tracking-tighter">
+                  Admin<span className="text-blue-600">Panel</span>
+                </span>
+              </Link>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsExpanded(false)}
+                className="cursor-pointer text-slate-300 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all h-9 w-9"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsExpanded(true)}
+              className="cursor-pointer bg-slate-50 text-slate-400 rounded-2xl h-12 w-12 hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 border border-slate-100/50"
             >
-              <div className="flex items-center gap-3">
-                <item.icon
-                  className={cn(
-                    "h-6 w-6",
-                    isActive
-                      ? "text-white"
-                      : "text-gray-400 group-hover:scale-110",
-                  )}
-                />
-                {isExpanded && (
-                  <span className="font-semibold text-sm">{item.name}</span>
+              <Menu className="h-6 w-6" />
+            </Button>
+          )}
+        </div>
+
+        <nav className="flex-1 px-4 space-y-2 mt-4">
+          {menuItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => isExpanded && setIsExpanded(false)}
+                className={cn(
+                  "group flex items-center rounded-2xl transition-all duration-300 relative cursor-pointer",
+                  isExpanded
+                    ? "px-4 py-3.5 justify-between"
+                    : "h-12 w-12 mx-auto justify-center",
+                  isActive
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-100"
+                    : "text-slate-500 hover:bg-blue-50 hover:text-blue-700",
                 )}
-              </div>
-              {!isExpanded && isActive && (
-                <div className="absolute -left-3 w-1.5 h-8 bg-orange-600 rounded-r-full" />
-              )}
-            </Link>
-          );
-        })}
-      </nav>
-    </div>
+              >
+                <div className="flex items-center gap-4">
+                  <item.icon
+                    className={cn(
+                      "h-5 w-5 transition-transform duration-300 group-hover:scale-110",
+                      isActive ? "text-white" : "text-slate-400",
+                    )}
+                  />
+                  {isExpanded && (
+                    <span className="font-bold text-sm tracking-tight whitespace-nowrap animate-in fade-in slide-in-from-left-2 duration-500">
+                      {item.name}
+                    </span>
+                  )}
+                </div>
+                {isExpanded && isActive && (
+                  <ChevronRight className="h-4 w-4 opacity-50" />
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="p-8 mt-auto border-t border-slate-50">
+          {isExpanded ? (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-700">
+              <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">
+                System Management
+              </p>
+              <p className="text-xs font-bold text-slate-400 mt-1">
+                v2.0.4 - 2026 🛡️
+              </p>
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              <div className="h-1.5 w-1.5 rounded-full bg-blue-200" />
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
