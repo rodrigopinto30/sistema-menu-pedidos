@@ -3,6 +3,7 @@
 import { useCartStore } from "@/store/useCartStore";
 import { Category } from "@/services/productServices";
 import { Button } from "./ui/button";
+import { useEffect, useState } from "react";
 
 interface CartSummaryProps {
   categories: Category[];
@@ -10,6 +11,7 @@ interface CartSummaryProps {
 
 export function CartSummary({ categories }: CartSummaryProps) {
   const { items, removeItem } = useCartStore();
+  const [mounted, setMounted] = useState(false);
 
   const getProductDetails = (id: number) => {
     if (!categories || !Array.isArray(categories)) return null;
@@ -25,8 +27,14 @@ export function CartSummary({ categories }: CartSummaryProps) {
     return acc + (details?.price || 0) * item.quantity;
   }, 0);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   if (items.length === 0)
     return <p className="text-gray-400 italic">Your cart is empty.</p>;
+
+  if (!mounted) return <div className="p-2 w-10" />;
 
   return (
     <div className="space-y-4 border-b pb-4 mb-6">

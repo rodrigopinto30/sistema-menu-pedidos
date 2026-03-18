@@ -17,10 +17,14 @@ export function CartDrawer() {
   const totalItems = useCartStore((state: any) => state.getTotalItems());
   const [categories, setCategories] = useState<Category[]>([]);
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     getMenu().then(setCategories).catch(console.error);
+    setMounted(true);
   }, []);
+
+  if (!mounted) return <div className="p-2 w-10" />;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
