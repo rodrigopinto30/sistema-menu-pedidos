@@ -1,6 +1,16 @@
+"use client";
+
 import React from "react";
-import { CheckCircle2, Clock, Package, Truck, Utensils } from "lucide-react";
+import {
+  CheckCircle2,
+  Clock,
+  Package,
+  Utensils,
+  XCircle,
+  MapPin,
+} from "lucide-react";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface HistoryItem {
   status: string;
@@ -10,47 +20,111 @@ interface HistoryItem {
 
 const statusConfig: Record<
   string,
-  { icon: any; color: string; label: string }
+  { icon: any; color: string; bgColor: string; label: string }
 > = {
-  pending: { icon: Package, color: "text-slate-500", label: "Order Placed" },
-  preparing: { icon: Utensils, color: "text-amber-500", label: "Preparing" },
-  ready: { icon: Clock, color: "text-indigo-500", label: "Ready to Pick Up" },
+  pending: {
+    icon: Package,
+    color: "text-slate-400",
+    bgColor: "bg-slate-50",
+    label: "Order Received",
+  },
+  preparing: {
+    icon: Utensils,
+    color: "text-amber-500",
+    bgColor: "bg-amber-50",
+    label: "In Kitchen",
+  },
+  ready: {
+    icon: Clock,
+    color: "text-blue-500",
+    bgColor: "bg-blue-50",
+    label: "Ready for Pickup",
+  },
   delivered: {
     icon: CheckCircle2,
     color: "text-emerald-500",
-    label: "Delivered",
+    bgColor: "bg-emerald-50",
+    label: "Successfully Delivered",
   },
-  cancelled: { icon: Package, color: "text-red-500", label: "Cancelled" },
+  cancelled: {
+    icon: XCircle,
+    color: "text-red-500",
+    bgColor: "bg-red-50",
+    label: "Cancelled",
+  },
 };
 
 export default function OrderTimeline({ history }: { history: HistoryItem[] }) {
   return (
-    <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
+    <div className="relative space-y-12 before:absolute before:inset-0 before:left-5 before:h-full before:w-[2px] before:bg-gradient-to-b before:from-emerald-500/20 before:via-slate-100 before:to-transparent">
       {history.map((item, index) => {
         const config = statusConfig[item.status] || {
-          icon: Clock,
-          color: "text-gray-500",
+          icon: MapPin,
+          color: "text-slate-400",
+          bgColor: "bg-slate-50",
           label: item.status,
         };
         const Icon = config.icon;
+        const isLast = index === 0;
 
         return (
           <div
             key={index}
-            className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active"
+            className="relative flex items-start gap-8 group animate-in slide-in-from-left-4 duration-500"
+            style={{ animationDelay: `${index * 100}ms` }}
           >
-            <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-100 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-              <Icon className={`w-5 h-5 ${config.color}`} />
+            <div
+              className={cn(
+                "relative z-10 flex items-center justify-center w-10 h-10 rounded-2xl border-4 border-white transition-transform duration-500 group-hover:scale-110 shadow-sm",
+                isLast ? "bg-emerald-600 shadow-emerald-200" : "bg-slate-100",
+              )}
+            >
+              <Icon
+                className={cn("w-5 h-5", isLast ? "text-white" : config.color)}
+              />
             </div>
 
-            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded border border-slate-200 bg-white shadow">
-              <div className="flex items-center justify-between space-x-2 mb-1">
-                <div className="font-bold text-slate-900">{config.label}</div>
-                <time className="text-xs font-medium text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">
-                  {format(new Date(item.changed_at), "MMM d, h:mm a")}
+            <div
+              className={cn(
+                "flex-1 p-5 rounded-[24px] border transition-all duration-300",
+                isLast
+                  ? "bg-emerald-50/30 border-emerald-100 shadow-sm"
+                  : "bg-white border-slate-50",
+              )}
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={cn(
+                      "font-black tracking-tighter text-base",
+                      isLast ? "text-emerald-900" : "text-slate-800",
+                    )}
+                  >
+                    {config.label}
+                  </span>
+                  {isLast && (
+                    <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  )}
+                </div>
+                <time
+                  className={cn(
+                    "text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full",
+                    isLast
+                      ? "bg-emerald-600 text-white"
+                      : "bg-slate-100 text-slate-400",
+                  )}
+                >
+                  {format(new Date(item.changed_at), "h:mm a · MMM d")}
                 </time>
               </div>
-              <div className="text-slate-500 text-sm">{item.comment}</div>
+              <p
+                className={cn(
+                  "text-sm font-medium leading-relaxed",
+                  isLast ? "text-emerald-700/80" : "text-slate-500",
+                )}
+              >
+                {item.comment}
+              </p>
             </div>
           </div>
         );

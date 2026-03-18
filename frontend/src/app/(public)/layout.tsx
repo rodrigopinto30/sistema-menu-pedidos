@@ -20,13 +20,8 @@ export default function PublicLayout({
   if (isAuthPage) return <>{children}</>;
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <aside
-        className={cn(
-          "bg-white border-r border-gray-200 hidden md:flex flex-col sticky top-0 h-screen transition-all duration-300 ease-in-out",
-          isExpanded ? "w-64" : "w-20",
-        )}
-      >
+    <div className="flex min-h-screen">
+      <aside className="w-20 hidden md:flex flex-col sticky top-0 h-screen z-[70]">
         <AccountSidebar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
       </aside>
 
