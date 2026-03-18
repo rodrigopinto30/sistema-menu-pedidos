@@ -2,39 +2,35 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
 import {
+  LayoutDashboard,
   Package,
-  User,
+  ShoppingBag,
+  Settings,
+  Store,
   ChevronRight,
-  UtensilsCrossed,
   Menu,
-  ShieldCheck,
+  LogOut,
+  ListTree,
 } from "lucide-react";
-import { Button } from "./ui/button";
-import { useAuthStore } from "@/store/useAuthStore";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
-interface AccountSidebarProps {
+interface AdminSidebarProps {
   isExpanded: boolean;
   setIsExpanded: (value: boolean) => void;
 }
 
-export function AccountSidebar({
-  isExpanded,
-  setIsExpanded,
-}: AccountSidebarProps) {
-  const { user } = useAuthStore();
+const menuItems = [
+  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "Products", href: "/admin/products", icon: Package },
+  { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
+  { name: "Categories", href: "/admin/categories", icon: ListTree },
+  { name: "Back to Store", href: "/", icon: Store },
+];
+
+export function AdminSidebar({ isExpanded, setIsExpanded }: AdminSidebarProps) {
   const pathname = usePathname();
-
-  const navItems = [
-    { name: "Main Menu", href: "/", icon: UtensilsCrossed },
-    { name: "My Orders", href: "/account/order", icon: Package },
-    { name: "My Profile", href: "/account/profile", icon: User },
-  ];
-
-  if (user?.role === "admin") {
-    navItems.push({ name: "Admin Panel", href: "/admin", icon: ShieldCheck });
-  }
 
   return (
     <div className="flex flex-col h-full bg-white">
@@ -46,11 +42,11 @@ export function AccountSidebar({
       >
         {isExpanded && (
           <Link
-            href="/"
+            href="/admin"
             className="flex items-center gap-2 font-black text-xl text-orange-600 animate-in fade-in duration-500"
           >
-            <UtensilsCrossed className="h-6 w-6" />
-            <span>Foodie</span>
+            <LayoutDashboard className="h-6 w-6" />
+            <span>FoodieAdmin</span>
           </Link>
         )}
         <Button
@@ -64,7 +60,7 @@ export function AccountSidebar({
       </div>
 
       <nav className="flex-1 p-3 space-y-4 mt-4">
-        {navItems.map((item) => {
+        {menuItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
@@ -88,16 +84,12 @@ export function AccountSidebar({
                   )}
                 />
                 {isExpanded && (
-                  <span className="font-semibold text-sm animate-in slide-in-from-left-2 duration-300">
-                    {item.name}
-                  </span>
+                  <span className="font-semibold text-sm">{item.name}</span>
                 )}
               </div>
-              {isExpanded
-                ? isActive && <ChevronRight className="h-4 w-4 opacity-70" />
-                : isActive && (
-                    <div className="absolute -left-3 w-1.5 h-8 bg-orange-600 rounded-r-full" />
-                  )}
+              {!isExpanded && isActive && (
+                <div className="absolute -left-3 w-1.5 h-8 bg-orange-600 rounded-r-full" />
+              )}
             </Link>
           );
         })}
