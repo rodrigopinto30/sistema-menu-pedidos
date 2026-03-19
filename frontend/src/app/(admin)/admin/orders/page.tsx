@@ -14,15 +14,11 @@ import { Badge } from "@/components/ui/badge";
 import {
   Loader2,
   Eye,
-  ShoppingCart,
   Printer,
   Save,
   CheckCircle2,
-  Calendar,
-  Hash,
-  User,
-  MapPin,
   ClipboardList,
+  ImageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -130,7 +126,7 @@ export default function AdminOrdersPage() {
     );
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-700">
+    <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-700 pb-20">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-blue-600 bg-blue-50 w-fit px-3 py-1 rounded-full border border-blue-100/50 mb-2">
@@ -139,7 +135,7 @@ export default function AdminOrdersPage() {
               Order Logs
             </span>
           </div>
-          <h1 className="text-4xl font-black tracking-tighter text-slate-900">
+          <h1 className="text-4xl font-black tracking-tighter text-slate-900 leading-none">
             Order <span className="text-blue-600">Management</span>
           </h1>
         </div>
@@ -148,7 +144,7 @@ export default function AdminOrdersPage() {
         </Badge>
       </div>
 
-      <div className="bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
+      <div className="bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden overflow-x-auto">
         <Table>
           <TableHeader className="bg-slate-50/50">
             <TableRow className="hover:bg-transparent border-b border-slate-100">
@@ -165,7 +161,7 @@ export default function AdminOrdersPage() {
                 Status
               </TableHead>
               <TableHead className="py-5 px-6 text-right font-black text-[11px] uppercase tracking-widest text-slate-400">
-                Details
+                Actions
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -181,13 +177,13 @@ export default function AdminOrdersPage() {
                 <TableCell className="py-5 font-black text-slate-800">
                   {order.customer_name}
                 </TableCell>
-                <TableCell className="py-5 font-black text-slate-900">
+                <TableCell className="py-5 font-black text-slate-900 tracking-tighter">
                   ${order.total_price}
                 </TableCell>
                 <TableCell className="py-5">
                   <Badge
                     className={cn(
-                      "capitalize font-black text-[10px] tracking-widest border px-3 py-1 rounded-lg",
+                      "capitalize font-black text-[9px] tracking-widest border px-3 py-1 rounded-lg",
                       getStatusStyles(order.status),
                     )}
                   >
@@ -196,7 +192,7 @@ export default function AdminOrdersPage() {
                 </TableCell>
                 <TableCell className="py-5 px-6 text-right">
                   <Dialog
-                    onOpenChange={(open: any) => {
+                    onOpenChange={(open) => {
                       if (open) {
                         setSelectedOrder(order);
                         setTempStatus(order.status);
@@ -212,10 +208,10 @@ export default function AdminOrdersPage() {
                         <Eye className="h-5 w-5" />
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-md border-none rounded-[32px] shadow-2xl overflow-hidden p-0 bg-white">
+                    <DialogContent className="max-w-[95vw] md:max-w-md border-none rounded-[32px] shadow-2xl overflow-hidden p-0 bg-white">
                       <div className="bg-blue-600 h-1.5 w-full" />
-                      <div className="p-8 space-y-6">
-                        <DialogHeader className="flex flex-row items-center justify-between pb-2">
+                      <div className="p-6 md:p-8 space-y-6">
+                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                           <DialogTitle className="text-2xl font-black tracking-tighter">
                             Order <span className="text-blue-600">Details</span>
                           </DialogTitle>
@@ -223,57 +219,77 @@ export default function AdminOrdersPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => handlePrint(selectedOrder)}
-                            className="cursor-pointer rounded-xl font-black text-[10px] uppercase h-10 px-4"
+                            className="cursor-pointer rounded-xl font-black text-[9px] uppercase h-9 px-3"
                           >
-                            <Printer className="h-4 w-4 mr-2" /> Print
+                            <Printer className="h-3.5 w-3.5 mr-2" /> Print
                           </Button>
                         </DialogHeader>
 
-                        <div className="grid grid-cols-2 gap-4 bg-slate-50/50 p-6 rounded-[24px] border border-slate-100">
-                          <div className="space-y-1">
-                            <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest">
+                        <div className="grid grid-cols-2 gap-4 bg-slate-50/50 p-5 rounded-[24px] border border-slate-100">
+                          <div className="space-y-0.5">
+                            <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest leading-none">
                               Customer
                             </p>
-                            <p className="font-black text-slate-900 text-sm">
+                            <p className="font-black text-slate-900 text-sm truncate">
                               {selectedOrder?.customer_name}
                             </p>
                           </div>
-                          <div className="space-y-1 text-right">
-                            <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest">
+                          <div className="space-y-0.5 text-right">
+                            <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest leading-none">
                               Phone
                             </p>
-                            <p className="font-black text-slate-900 text-sm">
+                            <p className="font-black text-slate-900 text-sm truncate">
                               {selectedOrder?.customer_phone}
                             </p>
                           </div>
                         </div>
 
                         <div className="space-y-4">
-                          <h4 className="font-black text-slate-900 text-xs uppercase tracking-widest flex items-center gap-2">
+                          <h4 className="font-black text-slate-900 text-[10px] uppercase tracking-[0.2em] flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-emerald-500" />{" "}
-                            Summary
+                            Summary List
                           </h4>
-                          <div className="max-h-[180px] overflow-y-auto space-y-2">
+                          <div className="max-h-[220px] overflow-y-auto pr-2 space-y-3 custom-scrollbar">
                             {selectedOrder?.items?.map((item: any) => (
                               <div
                                 key={item.id}
-                                className="flex justify-between items-center p-3 rounded-2xl bg-white border border-slate-50"
+                                className="flex items-center gap-3 p-2 rounded-2xl bg-white border border-slate-50 shadow-sm group hover:border-blue-100 transition-colors"
                               >
-                                <span className="text-slate-800 font-bold text-xs">
-                                  {item.quantity}x {item.product?.name}
-                                </span>
-                                <span className="text-slate-900 font-black text-xs">
-                                  $
-                                  {(item.price_at_time * item.quantity).toFixed(
-                                    2,
+                                <div className="h-12 w-12 rounded-xl bg-slate-100 overflow-hidden shrink-0 border border-slate-50">
+                                  {item.product?.image_url ? (
+                                    <img
+                                      src={item.product.image_url}
+                                      alt={item.product.name}
+                                      className="h-full w-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="h-full w-full flex items-center justify-center">
+                                      <ImageIcon className="h-4 w-4 text-slate-300" />
+                                    </div>
                                   )}
-                                </span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-slate-800 font-black text-xs tracking-tight truncate">
+                                    {item.product?.name}
+                                  </p>
+                                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
+                                    Qty: {item.quantity} × ${item.price_at_time}
+                                  </p>
+                                </div>
+                                <div className="text-right shrink-0">
+                                  <span className="text-slate-900 font-black text-xs tracking-tight">
+                                    $
+                                    {(
+                                      item.price_at_time * item.quantity
+                                    ).toFixed(2)}
+                                  </span>
+                                </div>
                               </div>
                             ))}
                           </div>
                         </div>
 
-                        <div className="pt-4 border-t space-y-4">
+                        <div className="pt-4 border-t space-y-6">
                           <div className="flex gap-2 items-center">
                             <Select
                               value={tempStatus}
@@ -281,7 +297,7 @@ export default function AdminOrdersPage() {
                             >
                               <SelectTrigger
                                 className={cn(
-                                  "flex-1 h-11 rounded-full font-black text-[10px] uppercase tracking-widest border-2 transition-all px-5",
+                                  "flex-1 h-12 rounded-2xl font-black text-[10px] uppercase tracking-widest border-2 transition-all px-5",
                                   getStatusStyles(tempStatus),
                                 )}
                               >
@@ -298,7 +314,7 @@ export default function AdminOrdersPage() {
                                   <SelectItem
                                     key={s}
                                     value={s}
-                                    className="capitalize font-bold text-xs py-2.5 focus:bg-blue-50 focus:text-blue-600 rounded-lg cursor-pointer"
+                                    className="capitalize font-bold text-xs py-3 focus:bg-blue-50 focus:text-blue-600 rounded-lg cursor-pointer"
                                   >
                                     {s}
                                   </SelectItem>
@@ -312,24 +328,25 @@ export default function AdminOrdersPage() {
                                 isUpdating ||
                                 tempStatus === selectedOrder?.status
                               }
-                              className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-black w-11 h-11 rounded-full shadow-lg shadow-blue-200 transition-all active:scale-95 disabled:opacity-50 disabled:shadow-none p-0 flex items-center justify-center shrink-0"
+                              className="cursor-pointer bg-slate-900 hover:bg-blue-600 text-white font-black w-12 h-12 rounded-2xl shadow-xl transition-all active:scale-90 disabled:opacity-30 p-0 flex items-center justify-center shrink-0"
                             >
                               {isUpdating ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <Loader2 className="h-5 w-5 animate-spin" />
                               ) : (
-                                <Save className="h-4 w-4" />
+                                <Save className="h-5 w-5" />
                               )}
                             </Button>
                           </div>
-                        </div>
 
-                        <div className="pt-4 flex justify-between items-center">
-                          <span className="text-slate-400 text-[10px] font-black uppercase tracking-widest">
-                            Total
-                          </span>
-                          <span className="text-3xl font-black text-slate-900 tracking-tighter">
-                            ${selectedOrder?.total_price}
-                          </span>
+                          <div className="flex justify-between items-center bg-slate-900 p-5 rounded-[24px] shadow-xl shadow-slate-200">
+                            <span className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">
+                              Grand Total
+                            </span>
+                            <span className="text-3xl font-black text-white tracking-tighter">
+                              <span className="text-blue-400 mr-1">$</span>
+                              {selectedOrder?.total_price}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </DialogContent>
