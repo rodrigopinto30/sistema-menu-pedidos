@@ -62,6 +62,7 @@ class OrderController extends Controller
         });
     }
 
+<<<<<<< Updated upstream
     public function updateStatus(Request $request, Order $order)
     {
         try {
@@ -79,5 +80,20 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
+=======
+
+    public function updateStatus(Request $request, Order $order)
+    {
+        $validated = $request->validate([
+            'status' => 'required|string|in:pending,preparing,shipped,delivered,cancelled'
+        ]);
+
+        $order->update(['status' => $validated['status']]);
+
+        return response()->json([
+            'message' => 'Order status updated successfully',
+            'order' => $order
+        ]);
+>>>>>>> Stashed changes
     }
 }

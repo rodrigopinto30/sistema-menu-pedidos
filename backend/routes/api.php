@@ -11,10 +11,16 @@ use App\Http\Controllers\Api\AuthController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+<<<<<<< Updated upstream
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+=======
+Route::get('/orders', [OrderController::class, 'index']);
+Route::post('/orders', [OrderController::class, 'store']);
+Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus']);
+>>>>>>> Stashed changes
 
     Route::patch('/user/profile', [AuthController::class, 'updateProfile']);
     Route::post('/user/change-password', [AuthController::class, 'changePassword']);
