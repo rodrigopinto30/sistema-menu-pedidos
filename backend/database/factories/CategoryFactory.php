@@ -16,9 +16,11 @@ class CategoryFactory extends Factory
      */
     public function definition(): array
     {
+        $name = $this->faker->unique()->words(1, true);
         return [
-            'name' => $this->faker->unique()->word(),
-            'slug' => $this->faker->unique()->slug(),
+            'name'      => ucfirst($name),
+            'slug'      => \Illuminate\Support\Str::slug($name),
+            'image'     => 'https://loremflickr.com/640/480/food',
             'is_active' => true,
         ];
     }
