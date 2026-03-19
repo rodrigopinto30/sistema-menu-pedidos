@@ -16,12 +16,13 @@ class ProductFactory extends Factory
      */
     public function definition(): array
     {
+        $name = $this->faker->unique()->words(2, true);
         return [
-            'category_id' => \App\Models\Category::factory(),
-            'name' => $this->faker->word(),
-            'slug' => $this->faker->slug(),
-            'description' => $this->faker->sentence(),
-            'price' => $this->faker->randomFloat(2, 5, 100),
+            'name'         => ucfirst($name),
+            'slug'         => \Illuminate\Support\Str::slug($name),
+            'description'  => $this->faker->sentence(10),
+            'price'        => $this->faker->randomFloat(2, 5, 50),
+            'image_url'        => 'https://loremflickr.com/640/480/cuisine',
             'is_available' => true,
         ];
     }
