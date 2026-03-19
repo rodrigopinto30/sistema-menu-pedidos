@@ -1,0 +1,10 @@
+#!/bin/bash
+
+RED='\033[0;31m'
+NC='\033[0m'
+
+echo -e "${RED}🛑 Stopping Menu & Order System...${NC}"
+
+docker compose down
+
+echo -e "${RED}❌ All services stopped.${NC}"
