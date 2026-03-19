@@ -42,58 +42,43 @@ class OrderController extends Controller
 
             foreach ($request->items as $item) {
                 $product = Product::find($item['product_id']);
-                $subtotal = $product->price * $item['quantity'];
+                $totalPrice += ($product->price * $item['quantity']);
 
                 $order->items()->create([
                     'product_id'    => $product->id,
                     'quantity'      => $item['quantity'],
                     'price_at_time' => $product->price,
                 ]);
-
-                $totalPrice += $subtotal;
             }
 
             $order->update(['total_price' => $totalPrice]);
 
             return response()->json([
                 'message' => 'Order created successfully',
-                'order'   => $order->load(['items', 'history'])
+                'order'   => $order->load(['items.product', 'history'])
             ], 201);
         });
     }
 
-<<<<<<< Updated upstream
     public function updateStatus(Request $request, Order $order)
     {
         try {
             $validated = $request->validate([
-                'status' => 'required|string'
+                'status' => 'required|string|in:pending,preparing,ready,delivered,cancelled'
             ]);
 
             $order->status = $validated['status'];
             $order->save();
 
             return response()->json([
-                'message' => 'Status updated',
+                'message' => 'Order status updated successfully',
                 'order' => $order->load('history')
             ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json([
+                'error' => 'Failed to update order status',
+                'details' => $e->getMessage()
+            ], 500);
         }
-=======
-
-    public function updateStatus(Request $request, Order $order)
-    {
-        $validated = $request->validate([
-            'status' => 'required|string|in:pending,preparing,shipped,delivered,cancelled'
-        ]);
-
-        $order->update(['status' => $validated['status']]);
-
-        return response()->json([
-            'message' => 'Order status updated successfully',
-            'order' => $order
-        ]);
->>>>>>> Stashed changes
     }
 }
