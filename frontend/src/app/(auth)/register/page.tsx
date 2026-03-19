@@ -18,9 +18,16 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
+import {
+  User,
+  Mail,
+  LockKeyhole,
+  UserPlus,
+  ArrowRight,
+  ShoppingBag,
+} from "lucide-react";
 
 export default function RegisterPage() {
-  const setAuth = useAuthStore((state: any) => state.setAuth);
   const router = useRouter();
 
   const form = useForm<SignUpInput>({
@@ -37,112 +44,169 @@ export default function RegisterPage() {
         password_confirmation: data.confirmPassword,
       });
 
-      toast.success("Account created! Please sign in with your credentials.");
+      toast.success("Account created! Redirecting to login...");
 
       setTimeout(() => {
         router.push("/login");
       }, 2000);
     } catch (error: any) {
-      if (error.response?.status === 500) {
-        toast.error("Server error. Please try again later.");
-      } else {
-        const serverErrors = error.response?.data?.errors;
-        const message = serverErrors
-          ? (Object.values(serverErrors).flat()[0] as string)
-          : error.response?.data?.message;
+      const serverErrors = error.response?.data?.errors;
+      const message = serverErrors
+        ? (Object.values(serverErrors).flat()[0] as string)
+        : error.response?.data?.message;
 
-        toast.error(message || "Registration failed");
-      }
-      console.error("Register Error:", error.response?.data);
+      toast.error(message || "Registration failed");
     }
   };
 
+  const labelStyle =
+    "text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1";
+  const inputContainerStyle = "relative group";
+  const iconStyle =
+    "absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-emerald-600 transition-colors";
+  const inputStyle =
+    "pl-11 h-12 rounded-2xl bg-slate-50 border-slate-100 focus:bg-white transition-all font-medium";
+
   return (
-    <div className="max-w-md mx-auto mt-20 p-6 bg-white rounded-xl shadow-lg border">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Create your account</h1>
-        <p className="text-sm text-gray-500">Join Foodie and start ordering</p>
-      </div>
+    <div className="min-h-[90vh] flex flex-col items-center justify-center py-12 px-4 animate-in fade-in zoom-in-95 duration-500">
+      <Link href="/" className="flex items-center gap-2 mb-8 group">
+        <div className="bg-emerald-600 p-2 rounded-xl group-hover:rotate-12 transition-transform shadow-lg shadow-emerald-200">
+          <ShoppingBag className="h-6 w-6 text-white" />
+        </div>
+        <span className="text-2xl font-black text-slate-900 tracking-tighter">
+          Foodie<span className="text-emerald-600">App</span>
+        </span>
+      </Link>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }: { field: any }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="John Doe" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      <div className="w-full max-w-md bg-white rounded-[32px] shadow-2xl shadow-slate-200/60 border border-slate-100 p-10 space-y-8">
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100/50 mb-2">
+            <UserPlus className="h-3.5 w-3.5" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+              Join the Community
+            </span>
+          </div>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tighter">
+            Create <span className="text-emerald-600">Account</span>
+          </h1>
+          <p className="text-slate-400 font-medium text-sm italic">
+            Start your culinary journey today
+          </p>
+        </div>
 
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }: { field: any }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="john@example.com"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }: { field: any }) => (
+                <FormItem className="space-y-1.5">
+                  <FormLabel className={labelStyle}>Full Name</FormLabel>
+                  <FormControl>
+                    <div className={inputContainerStyle}>
+                      <User className={iconStyle} />
+                      <Input
+                        placeholder="John Doe"
+                        {...field}
+                        className={inputStyle}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage className="text-[10px] font-bold" />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }: { field: any }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="••••••" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }: { field: any }) => (
+                <FormItem className="space-y-1.5">
+                  <FormLabel className={labelStyle}>Email Address</FormLabel>
+                  <FormControl>
+                    <div className={inputContainerStyle}>
+                      <Mail className={iconStyle} />
+                      <Input
+                        placeholder="john@example.com"
+                        {...field}
+                        className={inputStyle}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage className="text-[10px] font-bold" />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }: { field: any }) => (
-              <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="••••••" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <div className="grid grid-cols-1 gap-4">
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }: { field: any }) => (
+                  <FormItem className="space-y-1.5">
+                    <FormLabel className={labelStyle}>Password</FormLabel>
+                    <FormControl>
+                      <div className={inputContainerStyle}>
+                        <LockKeyhole className={iconStyle} />
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          {...field}
+                          className={inputStyle}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-[10px] font-bold" />
+                  </FormItem>
+                )}
+              />
 
-          <Button
-            type="submit"
-            className="cursor-pointer w-full bg-orange-600 hover:bg-orange-700 h-11 transition-colors"
-          >
-            Sign Up
-          </Button>
-        </form>
-      </Form>
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }: { field: any }) => (
+                  <FormItem className="space-y-1.5">
+                    <FormLabel className={labelStyle}>
+                      Confirm Password
+                    </FormLabel>
+                    <FormControl>
+                      <div className={inputContainerStyle}>
+                        <LockKeyhole className={iconStyle} />
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          {...field}
+                          className={inputStyle}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-[10px] font-bold" />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-      <div className="mt-6 text-center text-sm">
-        <span className="text-gray-500">Already have an account? </span>
-        <Link
-          href="/login"
-          className="text-orange-600 font-semibold hover:underline"
-        >
-          Login here
-        </Link>
+            <Button
+              type="submit"
+              className="w-full h-12 bg-slate-900 hover:bg-emerald-600 text-white font-black rounded-2xl transition-all active:scale-95 shadow-lg shadow-slate-200 cursor-pointer flex items-center justify-center gap-2 group mt-4"
+            >
+              Sign Up Now
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </form>
+        </Form>
+
+        <div className="pt-6 text-center border-t border-slate-50">
+          <p className="text-sm font-medium text-slate-500">
+            Already have an account?{" "}
+            <Link
+              href="/login"
+              className="text-emerald-600 font-black hover:underline underline-offset-4"
+            >
+              Login here
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
