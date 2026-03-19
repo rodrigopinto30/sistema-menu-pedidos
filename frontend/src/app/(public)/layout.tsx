@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react"; // Importamos useState
+import { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AccountSidebar } from "@/components/AccountSidebar";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Toaster } from "sonner";
 
 export default function PublicLayout({
   children,
@@ -28,7 +29,10 @@ export default function PublicLayout({
       <div className="flex-1 flex flex-col">
         <Navbar />
         <main className="flex-1 p-4 md:p-8">
-          <div className="max-w-6xl mx-auto">{children}</div>
+          <div className="max-w-6xl mx-auto">
+            {children}
+            <Toaster position="top-center" richColors />
+          </div>
         </main>
         <Footer />
       </div>

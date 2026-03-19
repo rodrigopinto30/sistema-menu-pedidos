@@ -1,20 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import api from "@/lib/api";
 import OrderTimeline from "@/components/OrderTimeline";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, ChevronRight, ShoppingBag, Clock } from "lucide-react";
-import { getStatusStyles } from "@/lib/consts/order-constants";
 import { cn } from "@/lib/utils";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const searchParams = useSearchParams();
+  const lastOrderId = searchParams.get("last_order");
 
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  useEffect(() => {
+    if (lastOrderId && orders.length > 0) {
+      const order = orders.find((o) => o.id.toString() === lastOrderId);
+      if (order) setSelectedOrder(order);
+    }
+  }, [lastOrderId, orders]);
 
   const fetchOrders = async () => {
     try {
@@ -54,28 +62,29 @@ export default function OrdersPage() {
           ) : (
             orders.map((order) => {
               const isSelected = selectedOrder?.id === order.id;
+              const isNew = order.id.toString() === lastOrderId;
+
               return (
                 <div
                   key={order.id}
                   className={cn(
                     "group cursor-pointer p-5 transition-all duration-300 rounded-[24px] border relative overflow-hidden",
                     isSelected
-                      ? "bg-white border-emerald-500 ring-4 ring-emerald-500/5 translate-x-2"
+                      ? "bg-white border-emerald-500 ring-4 ring-emerald-500/5 translate-x-2 shadow-lg shadow-emerald-100/20"
                       : "bg-slate-50/50 border-slate-100 hover:bg-white hover:border-emerald-200",
+                    isNew && !isSelected && "animate-pulse border-emerald-300",
                   )}
                   onClick={() => setSelectedOrder(order)}
                 >
                   <div className="flex justify-between items-start relative z-10">
                     <div className="space-y-1.5">
-                      <p className="font-black text-slate-800 tracking-tight">
+                      <p className="font-black text-slate-800 tracking-tight flex items-center gap-2">
                         Order #{order.id}
-                      </p>
-                      <div
-                        className={cn(
-                          "text-[10px] uppercase font-black px-2.5 py-1 rounded-lg inline-block tracking-wider",
-                          "bg-white border border-slate-100 shadow-sm text-slate-600",
+                        {isNew && (
+                          <span className="bg-emerald-500 w-2 h-2 rounded-full animate-ping" />
                         )}
-                      >
+                      </p>
+                      <div className="text-[10px] uppercase font-black px-2.5 py-1 rounded-lg inline-block tracking-wider bg-white border border-slate-100 shadow-sm text-slate-600">
                         {order.status}
                       </div>
                     </div>
@@ -101,7 +110,7 @@ export default function OrdersPage() {
 
         <div className="lg:col-span-8">
           {selectedOrder ? (
-            <div className="bg-white rounded-[32px] border border-slate-100 overflow-hidden transition-all duration-500 animate-in zoom-in-95">
+            <div className="bg-white rounded-[32px] border border-slate-100 overflow-hidden transition-all duration-500 animate-in zoom-in-95 shadow-2xl shadow-slate-200/50">
               <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
                 <div className="flex items-center gap-4">
                   <div className="bg-emerald-600 p-3 rounded-2xl shadow-lg shadow-emerald-100">
@@ -128,7 +137,7 @@ export default function OrdersPage() {
                   </p>
                   <p className="text-slate-700 font-bold text-base leading-relaxed tracking-tight">
                     {selectedOrder.items
-                      .map((i: any) => `${i.quantity}x ${i.product.name}`)
+                      .map((i: any) => `${i.quantity}x ${i.product?.name}`)
                       .join(", ")}
                   </p>
                 </div>
@@ -139,7 +148,7 @@ export default function OrdersPage() {
               </div>
             </div>
           ) : (
-            <div className="h-[500px] flex flex-col items-center justify-center rounded-[40px] border-2 border-dashed border-slate-100 bg-slate-50/30 text-slate-400 transition-all duration-500">
+            <div className="h-[500px] flex flex-col items-center justify-center rounded-[40px] border-2 border-dashed border-slate-100 bg-slate-50/30 text-slate-400">
               <div className="bg-white p-6 rounded-[24px] shadow-sm mb-6 border border-slate-50">
                 <Package className="w-12 h-12 text-emerald-100" />
               </div>
